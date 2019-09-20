@@ -27,6 +27,7 @@ class MY_Controller extends CI_Controller
         $this->load->model('General');
         $this->load->model('User');
         $this->load->model('Main_model');
+        
         $this->load->helper("url");
         $this->load->library("pagination");
         $this->load->library('ciqrcode');

@@ -156,13 +156,7 @@ class Employees extends MY_Controller
 
         $where = array('EMP_ID' => $emp_id);
         $this->db->update('employee_profile', $data, $where);
-        $this->session->set_flashdata('msg', '<div class="alert alert-success alert-dismissable">
-   <button type="button" class="close" data-dismiss="alert"
-      aria-hidden="true">
-      &times;
-   </button>
-   <span>Record Updated Successfully..!</span>
-</div>');
+        $this->session->set_flashdata('msg', 'Record Updated Successfully..');
 
         redirect(base_url() . 'index.php/employees/employee_list');
 

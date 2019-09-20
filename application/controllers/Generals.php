@@ -23,7 +23,7 @@ class generals extends MY_Controller
         } else {
 
 
-            redirect(base_url() . 'index.php/Users/login');
+            redirect(base_url() . 'Users/login');
 
         }
     }
@@ -42,8 +42,7 @@ class generals extends MY_Controller
             //SET SESSION FOR PAGE ID................................................
             $this->session->set_userdata("menu_id", $pagerow->MENU_ID);
         }
-        redirect(base_url() . 'index.php/'.$getPage);
-
+        redirect(base_url() .$getPage);
     }
 
     // Creating breadcrumbs
@@ -57,7 +56,7 @@ class generals extends MY_Controller
             if ($row_r->PARENT_ID != 0) {
 
                 $this->session->set_userdata("child_name", $row_r->MENU_TEXT);
-                $this->session->set_userdata("child_url", base_url() . "index.php/" . $row_r->MENU_URL);
+                $this->session->set_userdata("child_url", base_url() . $row_r->MENU_URL);
 
                 $row2 = $this->General->fetch_bysinglecol("MENU_ID", "usr_menu", $row_r->PARENT_ID);
 
@@ -257,7 +256,7 @@ class generals extends MY_Controller
         extract($_POST);
         $group_id = $this->input->post('group_id');
 
-        $menus = $this->menus->fetch_permission_navi();
+        $menus = $this->Menus->fetch_permission_navi();
 
         foreach ($menus as $menus) {
 
@@ -350,7 +349,7 @@ class generals extends MY_Controller
         }
 
 
-        redirect(base_url() . 'index.php/Generals/add_permission/' . $group_id);
+        redirect(base_url() . 'Generals/add_permission/' . $group_id);
     }
 
     // Permission checking

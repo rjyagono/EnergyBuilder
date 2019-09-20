@@ -1,8 +1,11 @@
-<!-- page start-->
+<?php if($this->session->flashdata('msg'))
+    echo "<div class='alert alert-success alert-dismissable'>
+               <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
+                  &times;
+               </button>
+               <span>".$this->session->flashdata('msg')."</span></div>";
+?>
 
-<?php if($this->session->flashdata('msg')){
-    echo "<span class='alert alert-success'>".$this->session->flashdata('msg')."</span>";
-}?>
 <div class="row">
     <div class="col-sm-12">
         <div class="portlet box red">

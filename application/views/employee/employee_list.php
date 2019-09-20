@@ -1,6 +1,11 @@
 <?php if($this->session->userdata('msg'))
-    echo "<span >".$this->session->userdata('msg')."</span>";
+    echo "<div class='alert alert-success alert-dismissable'>
+               <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
+                  &times;
+               </button>
+               <span>".$this->session->userdata('msg')."</span></div>";
 ?>
+
 <div class="row">
     <div class="col-xs-12">
         <div class="box">
