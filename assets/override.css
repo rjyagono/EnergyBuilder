@@ -1,0 +1,30 @@
+/*!
+ *   AdminLTE v2.4.0
+ *   Author: Jude 
+ *   License: Open source - MIT
+ *           Please visit http://opensource.org/licenses/MIT for more information
+ */
+/*
+ * Core: Layout Style
+ * -------------------------
+ */
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+}
+
+.page-header {
+    margin: 10px  !important;
+    font-size: 22px;
+}
+
+.page-header h3 { margin: 5px  !important; }
+
+
+.treeview-menu>li>a {
+    font-size: 12px;
+}
+
+td {
+    font-weight: 400;
+}
