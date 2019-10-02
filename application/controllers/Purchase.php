@@ -9,14 +9,8 @@ class Purchase extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Main_model');
-        if ($this->session->userdata("user_id")) {
-
-        } else {
-            redirect(base_url() . 'users/login');
-        }
-
-
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
     }
 
     // Get item by search
@@ -34,21 +28,33 @@ class Purchase extends MY_Controller
     // Loading New Purchase form
     public function new_purchase()
     {
+        $warehouse_id = $this->_warehouse_id;
         $data['purchase'] = $this->Main_model->item_cat();
-        $data['products'] = $this->db->query("SELECT * FROM stock AS s, item AS i WHERE  s.stock_qty >= 0 AND i.`item_id` = s.`item_id`")->result();
+        $data['products'] = $this->db->query("SELECT * FROM stock AS s, item AS i WHERE  s.stock_qty >= 0 AND i.`item_id` = s.`item_id` AND s.`warehouse_id` = $warehouse_id")->result();
         $data['vendors'] = $this->Main_model->select('vendor');
-        $data['companies'] = $this->Main_model->select('company');
-        $data['category'] = $this->Main_model->select('category');
-        $record = $this->Main_model->get_purchase_max();
-        $ddd = $record->purchase_no;
-        $data['purchase_no'] = $ddd + 1;
-        $this->header($title = 'New Purchase');
-        $this->load->view('purchase/list_purchases', $data);
+        $data['warehouses'] = $this->Main_model->select('warehouses');
+
+        $this->header();
+        $this->load->view('purchase/new', $data);
         $this->footer();
-
-
     }
 
+    public function edit()
+    {
+        $warehouse_id = $this->_warehouse_id;
+        $purchase_id = $this->uri->segment(3);
+        $where = array('purchase_id' => $purchase_id);
+
+        $data['header'] = $this->Main_model->single_row('purchase', $where);
+        $data['details'] = $this->Main_model->select('purchase_details', 'purchase_id = $purchase_id');
+        $data['products'] = $this->db->query("SELECT * FROM stock AS s, item AS i WHERE  s.stock_qty >= 0 AND i.`item_id` = s.`item_id` AND s.`warehouse_id` = $warehouse_id")->result();
+        $data['vendors'] = $this->Main_model->select('vendor');
+        $data['warehouses'] = $this->Main_model->select('warehouses');
+
+        $this->header();
+        $this->load->view('purchase/edit', $data);
+        $this->footer();
+    }
     // Daily Purchase Report
     public function daily_purchase_report()
     {
@@ -105,141 +111,182 @@ class Purchase extends MY_Controller
             $output .= '<td>' . $data->item_name . '</td>';
             $output .= '<td><div id="spinner4">
 
-     <input type="text" name="quantity[]" tabindex="1" id="quantity_' . $count . '" onclick="calculate_single_entry_sum(' . $count . ')" size="2" value="1" class="form-control col-lg-2" onkeyup="calculate_single_entry_sum(' . $count . ')">
+            <input type="text" name="quantity[]" tabindex="1" id="quantity_' . $count . '" onclick="calculate_single_entry_sum(' . $count . ')" size="2" value="1" class="form-control col-lg-2" onkeyup="calculate_single_entry_sum(' . $count . ')">
 
-                                </div>
-                            </div></td>';
-            $output .= '<td><input type="text" name="unit_price[]" readonly="readonly" id="unit_price_' . $count . '" size="6" value="' . $data->purchase_rate . '"></td>';
-            $output .= '<td>
-        <input type="text" name="purchase_amount[]" readonly="readonly" id="single_entry_total_' . $count . '" size="6" value="' . $data->purchase_rate . '">
-        </td>';
-            $output .= '<td>
-<i style="cursor: pointer;" id="delete_button_' . $count . '" onclick="delete_row(' . $count . ')" class="fa fa-trash"></i>
-				</td>';
-            $output .= '</tr>';
+                                    </div>
+                                </div></td>';
+                $output .= '<td><input type="text" class="form-control col-lg-2" name="unit_price[]" id="unit_price_' . $count . '" size="6" value="' . $data->purchase_rate . ' "onkeyup="calculate_single_entry_sum(' . $count . ')"></td>';
+                $output .= '<td>
+            <input type="text" class="form-control col-lg-2" name="purchase_amount[]" readonly="readonly" id="single_entry_total_' . $count . '" size="6" value="' . $data->purchase_rate . '">
+            </td>';
+                $output .= '<td>
+            <i style="cursor: pointer;" id="delete_button_' . $count . '" onclick="delete_row(' . $count . ')" class="fa fa-trash"></i>
+    				</td>';
+                $output .= '</tr>';
 
             echo $output;
         } else {
             echo $output = 0;
         }
-
     }
 
-    // Insert new Purchase to Database
-    function insert_purchase()
+    public function save_purchase()
     {
+        extract($_POST);
+
         $this->load->helper('date');
-        $item_id = $this->input->post('item_id');
-        $category_id = $this->input->post('category_id');
-        $itemID = $this->input->post('unit_price');
-        $unit_price = $this->input->post('unit_price');
-        $quantity = $this->input->post('quantity');
-        $purchase_code = $this->input->post('purchase_code');
-        $purchase_amount = $this->input->post('purchase_amount');
+        $item_id = $this->input->post('item_id'); 
+        $rates = $this->input->post('rates');
+        $quantity = $this->input->post('cartons');
+        $purchase_id = $this->input->post('purchase_id');
+        $purchase_amount = $this->input->post('totals');
+        $where = array('purchase_id' => $purchase_id);
+
+        $warehouse_id = $this->_warehouse_id;
+        $user_id = $this->_user_id;
+
+        // Todo  change to local timezone & move to global settings
         $timezone = 'Asia/Karachi';
         date_default_timezone_set($timezone);
+        // end todo
 
-        $date_arr = explode('/', $this->input->post('purchase_date'));
-        $date = $date_arr[2] . "-" . $date_arr[0] . "-" . $date_arr[1];
+        $purchase_date = $this->input->post('purchase_date');
+        $delivery_date = $this->input->post('delivery_date');
 
-        for ($i = 0; $i < count($itemID); $i++) {
-            extract($_POST);
-
-            if (strlen($unit_price[$i]) > 0) {
-                $data1 = $this->Main_model->check_stock_record($item_id[$i], $category_id[$i]);
-                if ($data1) {
-                    //////////////////////////////////////////////////////////////////////////////////////////
-                    $data = $this->Main_model->get_stock_qty($item_id[$i], $category_id[$i]);
-                    $id = $data->stock_qty;
-                    $new_id = $id + $quantity[$i];
-
-                    $data = array(
-                        "stock_qty" => $new_id,
-                        "purchase_rate" => $unit_price[$i],
-
-                    );
-                    $where = array('item_id' => $item_id[$i], 'category_id' => $category_id[$i]);
-                    $this->Main_model->update_record('stock', $data, $where);
-
-                } else {
-                    $data = array(
-                        "item_id" => $item_id[$i],
-                        "category_id" => $category_id[$i],
-                        "stock_qty" => $quantity[$i],
-                        "purchase_rate" => $unit_price[$i],
-                    );
-                    $this->Main_model->add_record('stock', $data);
-                }
-            }
-
-            $maxID = $this->Main_model->get_purchase_max1();
-            $max = $maxID->purchase_id;
-            $pu_id = $max + 1;
-            $purchase_data = array(
-                'purchase_id' => $pu_id,
-                'purchase_no' => $purchase_code,
-                'item_id' => $item_id[$i],
-                'category_id' => $category_id[$i],
-                'purchase_qty' => $quantity[$i],
-                'purchase_amount' => $purchase_amount[$i],
-                'purchase_rate' => $unit_price[$i],
-                'expire_date' => date('Y-m-d')
-            );
-
-
-            $data_entry = $this->Main_model->add_record('purchase', $purchase_data);
-
-        }//for loop
         $vendor_id = $this->input->post('vendor_id');
-        $company_id = $this->input->post('company_id');
+        $destination_warehouse_id = $this->input->post('warehouse_id');
         $paymentTotal = $this->input->post('paymentTotal');
         $discount = $this->input->post('discount');
         $due_amount = $this->input->post('due_amount');
-        $sub_total = $this->input->post('sub_total');
-        $pur = "PUR-" . $purchase_code . date('Y-m');
+        $total_amount = $this->input->post('total_amount');
+        $status = STATUS_DRAFT; // define in global config
+
+
         $Purchase_comp_Ins = array(
-            'purchase_no' => $purchase_code,
-            'pur_no' => $pur,
-            'purchase_date' => $date,
+            'purchase_date' => $purchase_date,
             'vendor_id' => $vendor_id,
-            'company_id' => $company_id,
+            'destination_warehouse_id' => $destination_warehouse_id,
             'purchase_amount_total' => $paymentTotal,
             'purchase_discount' => $discount,
             'due_amount' => $due_amount,
-            'grand_total' => $sub_total,
-            'purchase_status' => 1,
-            'purchase_user_id' => $this->session->userdata('user_id')
+            'grand_total' => $total_amount,
+            'status' => $status,
+            'warehouse_id' => $destination_warehouse_id,
+            'user_id' => $user_id,
+            'delivery_date' => $delivery_date,
         );
-        $data_entry = $this->Main_model->add_record('purchase_company', $Purchase_comp_Ins);
 
-        if ($data_entry) {
-            $this->session->set_flashdata('success', 'Record added Successfully..!');
-            redirect(Base_url() . 'index.php/Purchase/show_purchase_history/' . $purchase_code . '');
+        if($purchase_id){
+            $where = array('purchase_id' => $purchase_id);
+            $this->Main_model->update_record('purchase', $Purchase_comp_Ins, $where);
+        } else {
+            $record = $this->Main_model->get_purchase_max();
+            $ddd = $record->purchase_id;
+            $purchase_no = $ddd + 1;
+
+            $Purchase_comp_Ins['pur_no'] = "PO-" . $purchase_no; 
+            $purchase_id = $this->Main_model->add_record('purchase', $Purchase_comp_Ins);
         }
 
+        $this->session->set_userdata("purchase_id", $purchase_id);
+
+
+        // log create
+            $this->logger
+                ->user($user_id)
+                ->user_name($this->_user_name)
+                ->transaction_id($this->session->userdata("purchase_id"))
+                ->transaction_date(date('Y-m-d'))
+                ->warehouse($this->_warehouse_id)
+                ->type('PO')
+                ->supplier_customer($Purchase_comp_Ins['vendor_id'])
+                ->remarks('Purchase Order to Supplier')
+                ->balance($Purchase_comp_Ins['grand_total'])
+                ->log();
+        // end log
+
+        for ($i = 0; $i < count($item_id); $i++) {
+
+            $purchase_data = array(
+                'item_id' => $item_id[$i],
+                'purchase_id' => $this->session->userdata("purchase_id"),
+                'purchase_qty' => $quantity[$i],
+                'purchase_amount' => $purchase_amount[$i],
+                'purchase_rate' => $rates[$i]
+            );
+             
+            if($detail_ids[$i]){
+               $where = array('purchase_detail_id' => $detail_ids[$i]);
+               $datail_entry = $this->Main_model->update_record('purchase_details', $purchase_data, $where);
+            } else {
+               $datail_entry = $this->Main_model->add_record('purchase_details', $purchase_data);
+            }
+
+            // log details
+            // $this->logger
+            //         ->item($purchase_data['item_id'])
+            //         ->user($user_id)
+            //         ->user_name($this->_user_name)
+            //         ->transaction_id($purchase_data['purchase_id'])
+            //         ->transaction_date(date('Y-m-d'))
+            //         ->warehouse($this->_warehouse_id)
+            //         ->type('PO')
+            //         ->supplier_customer($Purchase_comp_Ins['vendor_id'])
+            //         ->remarks('Purchase Order Items from Supplier')
+            //         ->balance($purchase_data['purchase_amount'])
+            //         ->stock_in($purchase_data['purchase_qty'])
+            //         ->quantity($purchase_data['purchase_qty'])
+            //         ->log();
+            // end log details 
+        } 
+
+
+        //if ($datail_entry) {
+            $this->session->set_flashdata('success', 'Record Saved Successfully!');
+            redirect(Base_url() . 'index.php/purchase/show/' . $this->session->userdata("purchase_id") . '');
+        // } else {
+        //     $this->session->set_flashdata('warning', 'No Changes or Check Again!');
+        //     redirect(Base_url() . 'index.php/Purchase/purchase_history');
+        // } 
     }
 
     // Purchase History
-    public function purchase_history()
+    public function listings()
     {
         $this->header($title = 'Purchase History');
         $data['purchase'] = $this->Main_model->select_purchases();
-        $this->load->view('purchase/purchase_history', $data);
+        $this->load->view('purchase/listings', $data);
         $this->footer();
     }
 
     // Show single Purchase Invoice details
-    public function show_purchase_history()
+    public function show()
     {
         $id = $this->uri->segment(3);
-        $this->header($title = "Invoice");
         $data['history'] = $this->Main_model->get_purchaseHistory($id);
-        $sql = $this->db->query("select * from purchase_company as p,vendor as v, company as c where purchase_no=$id AND p.vendor_id=v.vendor_id and c.company_id = v.company_id");
+
+        $sql = $this->db->query("select * from purchase as p,vendor as v, warehouses as w where purchase_id=$id AND p.vendor_id =v.vendor_id and p.warehouse_id = w.warehouse_id");
         $data['amount'] = $sql->row();
-        $this->load->view('purchase/item_purchase_history', $data);
+   
+        $this->header($title = "Invoice");
+        $this->load->view('purchase/show', $data);
         $this->footer();
     }
 
+
+    // Show single Purchase Invoice details
+    public function invoice_print()
+    {
+        $id = $this->uri->segment(3);
+        $data['history'] = $this->Main_model->get_purchaseHistory($id);
+
+        $sql = $this->db->query("select * from purchase as p,vendor as v, warehouses as w where purchase_id=$id AND p.vendor_id =v.vendor_id and p.warehouse_id = w.warehouse_id");
+        $data['amount'] = $sql->row();
+   
+        $this->header($title = "Invoice");
+        $this->load->view('purchase/print', $data);
+        $this->footer();
+    }
     // Take Payments if due
     public function take_payments()
     {
@@ -255,10 +302,9 @@ class Purchase extends MY_Controller
             if ($update) {
                 $data = array("status" => 1, "confirm" => "Record Updated");
             }
-            echo json_encode($data);
-            exit;
+            json_encode($data);
+ 
         }
-
 
     }
 

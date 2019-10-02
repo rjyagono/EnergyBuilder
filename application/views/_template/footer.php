@@ -1,13 +1,13 @@
 
 </div>
 <!-- /.content-wrapper -->
-<footer class="main-footer">
+<!-- <footer class="main-footer">
     <div class="pull-right hidden-xs">
-        <b>Version</b> 1.4.0
+        <b>Version</b> 1.0.0
     </div>
     <strong>Copyright &copy; 2019 <a href="#">Tabla Technologies</a>.</strong> All rights
     reserved.
-</footer>
+</footer> -->
 </div>
 <!-- ./wrapper -->
 
@@ -66,12 +66,35 @@
             'autoWidth': false
         })
     })
+
+       $(function () {
+          var dataTable = $('#dataTable1').DataTable({
+            'processing': true,
+            'serverSide': true,
+            'serverMethod': 'get',
+            'ajax': {
+               'url':'<?=base_url()?>stock/list_stock_json',
+                'data': function(data){
+                          // Read values
+                          var warehouse_id = $('#searchByWarehouse').val();
+
+                          // Append to data
+                          data.warehouse_id = warehouse_id;
+                       }
+            } 
+          });
+
+          $('#searchByWarehouse').change(function(){
+            dataTable.draw();
+          });
+        });
 </script>
 
 <script>
     $(document).ready(function () {
         $('.datepicker').datepicker({
-            autoclose: true
+            autoclose: true,
+            format: 'yyyy-mm-dd'
         })
         $.ajaxSetup({cache: false});
         $('#search').keyup(function () {

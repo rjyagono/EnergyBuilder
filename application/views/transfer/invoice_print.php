@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title><?=$title ?> | Invoice</title>
+  <title>Transfer Invoice</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
@@ -53,12 +53,6 @@
             <strong>Order#:</strong>
             <address>
                 <?= $header->transfer_order_no; ?><br> 
-            </address>
-        </div>
-        <div class="col-sm-3 invoice-col">
-            <strong>Customer:</strong>
-            <address>
-                <?= $header->customer_name; ?><br> 
             </address>
         </div>
       </div>

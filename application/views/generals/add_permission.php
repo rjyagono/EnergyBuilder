@@ -10,10 +10,13 @@
     <div class="col-sm-12">
         <div class="portlet box red">
             <div class="portlet-title">
-                <h4>
-                    PERMISSIONS LIST
-
-                </h4>
+                <div class="box-header with-border">
+                    <h3 class="box-title">PERMISSIONS LIST</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="portlet-body">
                 <div class="table-responsive">
@@ -359,21 +362,17 @@
 
                             <?php endforeach; // END, Parent Loop..................... ?>
                             </tbody>
+                            <tfoot> 
+                            <tr>
+                                <td colspan="5" style="text-align:right;">
+                                    <input type="submit" class="btn btn-primary" value="Save"> 
+                                </td>
+                            </tr>
+                            </tfoot>
                         </table>
-                        <hr>
-                        <input type="submit" class="btn btn-primary" value="Save">
+                        
                    <?php form_close();?>
-                    <div class="row-fluid">
-                        <div class="span6">
-                        </div>
-                        <div class="span6">
-                            <ul>
-                                <li class="active"><a
-                                        href="#">          <?php echo $this->pagination->create_links(); ?>
-                                    </a></li>
-                            </ul>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>

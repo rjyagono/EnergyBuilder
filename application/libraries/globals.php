@@ -1,0 +1,10 @@
+<?php
+
+defined('STATUS_DRAFT') OR define('STATUS_DRAFT', 1001);
+defined('STATUS_RECEIVED') OR define('STATUS_RECEIVED', 1002);
+defined('STATUS_PARTIAL') OR define('STATUS_PARTIAL', 1003);
+defined('STATUS_ISSUED') OR define('STATUS_ISSUED', 1004);
+defined('STATUS_INTRANSIT') OR define('STATUS_INTRANSIT', 1005);
+defined('STATUS_TRANSFERED') OR define('STATUS_TRANSFERED', 1006);
+
+?>

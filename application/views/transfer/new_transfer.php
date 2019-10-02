@@ -1,94 +1,82 @@
 <?php echo form_open(base_url() . 'index.php/transfer/create_invoice_action', array('method' => 'post')); ?>
 
-    <?php if ($this->session->flashdata('success'))
-        echo $this->session->flashdata('success');
-    ?>
+    <!-- /.login-logo -->
 <section class="panel">
-            <div class="panel-heading box box-info">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">Stock Transfer Form</h3>
+    <div class=" box box-info">
+<!--         <div class="box-header ">
+            <h3 class="box-title">Stock Transfer</h3>
 
-                        <div class="box-tools pull-right">
-                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                            </button>
-                            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                        <div class="table-responsive">
- 
-
-                           <div class="row">
-
-                                <div class="col-md-1">
-
-                                    <label>Order#</label>
-                                    <input type="text" value="" size="16" required name="transfer_order_no"
-                                           class="form-control form-control-inline input-medium">
-
-                                </div>
-
-                                <div class="col-md-2">
-
-                                    <label>Date</label>
-                                    <input type="text" value="" size="16" required name="transfer_date"
-                                           class="form-control form-control-inline input-medium datepicker">
-
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="sandbox">
-                                        <label for="select-beast">Customer:</label>
-                                        <select class="form-control" name="source_warehouse_id" required="required">
-                                            <option value="">SELECT CUSTOMER</option>
-                                            <?php foreach ($customers as $customer) : ?>
-                                                <option
-                                                    value="<?php echo $customer->customer_id ?>"><?php echo $customer->customer_name; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="sandbox">
-                                        <label for="select-beast">Source Site:</label>
-                                        <select class="form-control" name="source_warehouse_id" required="required">
-                                            <option value="">SELECT SITE</option>
-                                            <?php foreach ($warehouses as $warehouse) : ?>
-                                                <option
-                                                    value="<?php echo $warehouse->warehouse_id ?>"><?php echo $warehouse->warehouse_name; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="sandbox">
-                                        <label for="select-beast">Destination Site:</label>
-                                        <select class="form-control" name="destination_warehouse_id" required>
-                                            <option value="AL">SELECT SITE</option>
-                                            <?php foreach ($warehouses as $warehouse) : ?>
-                                                <option
-                                                    value="<?php echo $warehouse->warehouse_id ?>"><?php echo $warehouse->warehouse_name; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                        <!-- /.table-responsive -->
-                    </div>
-                    <!-- /.box-body -->
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
             </div>
+        </div> -->
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="table-responsive">
+               <div class="row">
+                    <div class="col-md-2">
+                        <label>Order#</label>
+                        <input type="text" value="" size="16" required name="transfer_order_no"
+                               class="form-control form-control-inline input-medium">
+                    </div>
 
- 
- 
+                    <div class="col-md-2">
+                        <label>Date</label>
+                        <input type="text" value="" size="16" required name="transfer_date"
+                               class="form-control form-control-inline input-medium datepicker">
+                    </div>
+
+                    <div class="col-md-3" style="display:none">
+                        <div class="sandbox">
+                            <label for="select-beast">Customer:</label>
+                            <select class="form-control" name="customer_id">
+                                <option value="">SELECT CUSTOMER</option>
+                                <?php foreach ($customers as $customer) : ?>
+                                    <option
+                                        value="<?php echo $customer->customer_id ?>"><?php echo $customer->customer_name; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                     <div class="col-md-3">
+                        <div class="sandbox">
+                            <label for="select-beast">Source Site:</label>
+                            <select class="form-control" name="source_warehouse_id" required="required">
+                                <option value="">SELECT SITE</option>
+                                <?php foreach ($warehouses as $warehouse) : ?>
+                                    <option
+                                        value="<?php echo $warehouse->warehouse_id ?>"><?php echo $warehouse->warehouse_name; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                    </div> 
+
+                    <div class="col-md-3">
+                        <div class="sandbox">
+                            <label for="select-beast">Destination Site:</label>
+                            <select class="form-control" name="destination_warehouse_id" required>
+                                <option value="AL">SELECT SITE</option>
+                                <?php foreach ($warehouses as $warehouse) : ?>
+                                    <option
+                                        value="<?php echo $warehouse->warehouse_id ?>"><?php echo $warehouse->warehouse_name; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Reason:</label>
+                        <textarea rows="2" class="form-control" name="reason"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.table-responsive -->
 </section>
 
 
@@ -96,9 +84,6 @@
     <div class="col-md-12 ui-sortable">
         <!-- begin panel -->
         <div class="panel panel-success">
-            <div class="panel-heading">
-                <h4 class="panel-title">Select Products To Transfer</h4>
-            </div>
             <div class="panel-body">
                 <div class="table-responsive">
                     <div style="" id="">
@@ -108,18 +93,18 @@
                             <thead>
                             <tr>
                                 <th>Select Item</th>
-                                <th>Stock/Qty</th>
-                                <th>Quantity</th>
-                                <th>Rate</th>
-                                <th>Total</th>
-                                <th>Action</th>
+                                <th width="15%">Stock/Qty</th>
+                                <th width="15%">Quantity</th>
+                                <th width="15%">Rate</th>
+                                <th width="15%">Total</th>
+                                <th width="1%"></th>
                             </tr>
                             </thead>
                             <tbody id="rows-list">
                             <tr>
                                 <td class="product-list">             
                                     <select class="form-control product input-xlarge" name="product_id[]"
-                                            onchange="return get_purchased_data(this.value);">
+                                            onchange="">
                                         <option value="">Add Product</option>
                                         <?php foreach ($products as $rows) :
                                             ?>
@@ -135,15 +120,14 @@
                                 <td><input type="number" name="rates[]" class="form-control rate"></td>
                                 <td><input type="number" name="totals[]" class="form-control total" readonly></td>
                                 <td align="center">
-                                    <button type="button" class="btn btn-danger delete-row">
-                                        <i class="fa fa-times"></i>
-                                    </button>
+                                    <a href="#" class="label label-danger delete-row" style="font-size: 100%;">
+                                    <i class="fa fa-trash"></i> </a>
                                 </td>
                             </tr>
                             </tbody>
                             <tfoot> 
                             <tr>
-                                <td colspan="5" style="text-align:right;">
+                                <td colspan="4" style="text-align:right;">
                                     <strong style="color: inherit;">Grand Total:</strong>
                                 </td>
                                 <td class="text-right">
@@ -153,14 +137,14 @@
                             </tr>
                             <tr>
                                 <td style="text-align:left;">
-                                    <button type="button" id="add-invoice-item" class="btn btn-success valid"
-                                           name="add-invoice-item"
-                                           onclick="addPurchaseInputField('rows-list');"
-                                            value="" tabindex="9" aria-invalid="false"><i class="fa fa-plus"></i></button>
+                                  <a class="" href="#" onclick="addPurchaseInputField('rows-list');" >
+                                   <i class="fa fa-plus"></i> Add New Item </a>
                                 </td>
                                 <td colspan="5" style="text-align:right;">
                                     <input type="submit" id="add-invoice" class="btn btn-primary" name="add-invoice"
-                                           value="Initiate Transfer">
+                                           value="Process Transfer">
+                                    <!-- <input type="submit" id="add-invoice-receive" class="btn btn-primary" name="add-invoice-receive"
+                                           value="Transfer and Receive"> -->
                                 </td>
                             </tr>
                             </tfoot>
@@ -325,7 +309,8 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $('.datepicker').datepicker({
-            autoclose: true
+            autoclose: true,
+            format: 'yyyy-mm-dd'
         })
         var base_url = "<?=base_url()?>";
         // $(".demo-select2-2").select2({
@@ -369,6 +354,7 @@
                     row.find(".discount").val(0);
                     row.find(".supplier_rate").val(res.supplier_price);
                     row.find(".carton").removeAttr('readonly', 'readonly');
+                    row.find(".carton").val(1);
                     do_total(row);
                     do_grand_total();
                 }

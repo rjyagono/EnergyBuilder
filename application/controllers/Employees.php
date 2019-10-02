@@ -16,13 +16,8 @@ class Employees extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        if ($this->session->userdata('user_id')) {
-
-        } else {
-            redirect(base_url() . 'index.php/Users/login');
-
-        }
-
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
     }
 
     // A view function for add new employee
@@ -70,22 +65,14 @@ class Employees extends MY_Controller
             }
         } else {
 
-            $picture = 'uploads/images/no_avatar.jpg';
+            $picture = 'assets/dist/img/no_avatar.png';
         }
 
 
         extract($_POST);
 
-        $this->load->model('Main_model');
-        $record = $this->Main_model->fetch_maxid("employee_profile");
-        foreach ($record as $record) {
-
-            $Maxtype = $record->EMP_ID;
-        }
-        $EMP_ID = $Maxtype + 1;
         $user_id = $this->session->userdata('user_id');
         $data = array(
-            'EMP_ID' => $EMP_ID,
             'EMP_NAME' => $emp_name,
             'EMP_EMAIL' => $fname,
             'EMP_ADDRESS' => $curr_address,
@@ -103,13 +90,8 @@ class Employees extends MY_Controller
         }
 
         $this->db->insert('employee_profile', $data);
-        $this->session->set_flashdata('msg', '<div class="alert alert-success alert-dismissable">
-               <button type="button" class="close" data-dismiss="alert"
-                  aria-hidden="true">
-                  &times;
-               </button>
-               <span>Record added Successfully..!</span>
-            </div>');
+
+        $this->session->set_flashdata('success', 'Employee added Successfully');
         redirect(base_url() . 'index.php/employees/employee_list');
 
 
@@ -156,8 +138,8 @@ class Employees extends MY_Controller
 
         $where = array('EMP_ID' => $emp_id);
         $this->db->update('employee_profile', $data, $where);
-        $this->session->set_flashdata('msg', 'Record Updated Successfully..');
 
+        $this->session->set_flashdata('info', 'Record Updated Successfully..');
         redirect(base_url() . 'index.php/employees/employee_list');
 
 
@@ -178,7 +160,10 @@ class Employees extends MY_Controller
         $id = $this->uri->segment(3);
         $where = array('EMP_ID' => $id);
         $this->header();
-        $data['empDetail'] = $this->Main_model->single_row('employee_profile', $where, 's');
+        $row = $data['empDetail'] = $this->Main_model->single_row('employee_profile', $where, 's');
+
+        // var_dump($row->EMP_ID);
+        // exit;
         $this->load->view('employee/emp_details', $data);
         $this->footer();
     }

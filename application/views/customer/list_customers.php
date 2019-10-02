@@ -16,7 +16,7 @@
                 <div class="page-header">
                     <h3> List of Customers 
                         <div class="pull-right">
-                            <a href="#myModal-1" data-toggle='modal' class='btn btn-info'><i class="glyphicon glyphicon-plus"></i> Add New </a>
+                            <a href="#myModal-1" data-toggle='modal' class='btn btn-alert'><i class="glyphicon glyphicon-plus"></i> Add New </a>
                         </div>
                     </h3>
                 </div>
@@ -40,7 +40,7 @@
                         <th>EMAIL
                         </th>
                         <th>
-                            Action
+                            
                         </th>
                     </tr>
                     </thead>
@@ -60,8 +60,7 @@
                         <td><?= $results->email ?>
                         <td>
                             <a href='#myModal<?= $results->customer_id ?>' data-toggle='modal'
-                               class='btn btn-warning' <?php echo $My_Controller->editPermission;?>><i class='fa fa-pencil-square-o'></i>
-                                Edit
+                               class='btn btn-default' <?php echo $My_Controller->editPermission;?>><i class='fa fa-pencil-square-o'></i>
                             </a>
 
                         </td>
@@ -95,7 +94,7 @@
                             <div class='col-lg-9'>
                                 <input type='hidden' name="cid" class='form-control' id='c_id'
                                        value='<?php echo $rows->customer_id; ?>'>
-                                <input type='text' name="cname" class='form-control' id='c_name'
+                                <input type='text' name="customer_name" class='form-control' id='c_name'
                                        value='<?php echo $rows->customer_name; ?>'>
                             </div>
                         </div>
@@ -104,7 +103,7 @@
                             <label for='inputPassword1' class='col-lg-3 col-sm-3 control-label'>PHONE NO</label>
 
                             <div class='col-lg-9'>
-                                <input type='text' name="ccell" class='form-control'
+                                <input type='text' name="phone_no" class='form-control'
                                        value="<?php echo $rows->phone_no; ?>" id='c_cell'>
                             </div>
                         </div>
@@ -112,7 +111,7 @@
                             <label for='inputPassword1' class='col-lg-3 col-sm-3 control-label'>FAX NO</label>
 
                             <div class='col-lg-9'>
-                                <input type='text' name="caddress" class='form-control'
+                                <input type='text' name="fax_no" class='form-control'
                                        value="<?php echo $rows->fax_no; ?>" id='c_address'
                                        placeholder=''>
                             </div>
@@ -122,7 +121,7 @@
                                    class='col-lg-3 col-sm-3 control-label'>EMAIL</label>
 
                             <div class='col-lg-9'>
-                                <input type='text' name="coldno" class='form-control'
+                                <input type='text' name="email" class='form-control'
                                        value="<?php echo $rows->email; ?>" id='c_oldNo'>
                             </div>
                         </div>
@@ -176,7 +175,7 @@
                             No</label>
 
                         <div class='col-lg-9'>
-                            <input type='text' name="fax_no" class='form-control'
+                            <input type='text' name="fax_no " class='form-control'
                                    value="" id='c_address'
                                    placeholder=''>
                         </div>

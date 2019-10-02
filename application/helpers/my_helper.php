@@ -87,12 +87,46 @@ if ( ! function_exists('currency'))
                 }
             }
         }
-
-
     }
-
-
 }
+if(!function_exists('typeStatus'))
+{
+    function typeStatus($val=0){
+        if($val == 1){
+            $value = '<span class="label label-primary">Paid</span>'; 
+        }else{
+            $value = '<span class="label label-warning">Pending</span>'; 
+        } 
 
+        return $value;
+    }
+}
+if(!function_exists('poStatus'))
+{
+    function poStatus($id){
+            $CI=& get_instance();
+            $CI->load->database();
+
+            $status = $CI->db->get_where('settings', array('settings_id' => $id))->row()->value;
+
+            return $status;
+    }
+}
+if(!function_exists('currency_format'))
+{
+    function currency_format($val='0'){
+        $symbol = '₱';
+        $value = $symbol.number_format($val, 2,'.',',');
+
+        return $value;
+    }
+}
+if(!function_exists('dateFormat'))
+{
+    function dateFormat($givenDate=null, $format='d M Y')
+    {
+        return date($format, strtotime($givenDate));
+    }
+}
 
 ?>

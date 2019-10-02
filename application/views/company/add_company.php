@@ -63,7 +63,7 @@
 
 <?php if ($this->session->userdata('lang') == "UR") {
 
-    echo "کسٹمر فارم";
+    echo "";
     ?>
     </header>
     <div class="panel-body">

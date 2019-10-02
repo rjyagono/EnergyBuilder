@@ -26,13 +26,38 @@ class MY_Controller extends CI_Controller
         $this->load->model('Menus');
         $this->load->model('General');
         $this->load->model('User');
+        $this->load->model('StockTransfer');
+        $this->load->model('PurchaseOrder');
+        $this->load->model('Receiving');
         $this->load->model('Main_model');
+        $this->load->model('Warehouse');
         
         $this->load->helper("url");
         $this->load->library("pagination");
         $this->load->library('ciqrcode');
+        $this->load->library('logger');
 
+        $this->_warehouse_id = $this->session->userdata('warehouse_id');
+        $this->_user_id = $this->session->userdata('user_id');
+        $this->_user_name = $this->session->userdata('username');
 
+        defined('STATUS_DRAFT') OR define('STATUS_DRAFT', 1001);
+        defined('STATUS_RECEIVED') OR define('STATUS_RECEIVED', 1002);
+        defined('STATUS_PARTIAL') OR define('STATUS_PARTIAL', 1003);
+        defined('STATUS_ISSUED') OR define('STATUS_ISSUED', 1004);
+        defined('STATUS_INTRANSIT') OR define('STATUS_INTRANSIT', 1005);
+        defined('STATUS_TRANSFERED') OR define('STATUS_TRANSFERED', 1006);
+
+    }
+
+    /*
+     * check sessions user data if it exists,
+     * it will go to the function requested
+     * otherwise it will redirect to login*/
+    public function checkUserSession(){
+        if (!$this->session->userdata('user_id')) {
+            redirect(base_url() . 'index.php/Users/login');
+        }
     }
 
     //Header for Applications...................................
@@ -43,6 +68,8 @@ class MY_Controller extends CI_Controller
 
         $data['My_Controller'] = $this;
         $data['company'] = $this->db->get_where('company_information', array('id' => 1))->row();
+        $data['title'] = $data['company']->name;
+        $data['title'] = $data['company']->name;
         $data['title'] = $data['company']->name;
         $data['content'] = "";
 
@@ -78,6 +105,8 @@ class MY_Controller extends CI_Controller
         $data["daily_st"] = $this->Main_model->get_daily_stock();
         $data['topsales'] = $this->Main_model->topsales();
         $data['topSalesYear'] = $this->Main_model->topSalesYear();
+        $data['below_stock_level'] = $this->Main_model->belowStockLevel();
+        $data['total_stocks_on_hand'] = $this->Main_model->StockOnHand();
 
         $this->load->view('_template/main', $data);
     }
@@ -157,7 +186,7 @@ class MY_Controller extends CI_Controller
                 if ($permissionResults->PER_INSERT == 1) {
 
 
-                    $this->savePermission = "<input type='submit' value='Save' class='btn btn-success btn-large' >";
+                    $this->savePermission = "<input type='submit' id='add-invoice' class='btn btn-primary' name='save' value='Process Saving'>";
 
 
                 } elseif ($permissionResults->PER_INSERT == 0) {

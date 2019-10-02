@@ -45,41 +45,43 @@
 </head>
 <body class="hold-transition skin-blue">
 <div class="wrapper">
+    <?php $My_Controller->Getsave_up_delPermissions(); ?>
+    <header class="main-header top-band">
 
-    <header class="main-header">
-        <!-- Logo -->
-        <a href="<?=base_url()?>index.php/dashboard" class="logo">
-            <!-- mini logo for sidebar mini 50x50 pixels -->
-            <span class="logo-mini"><b>K</b>UMS</span>
-            <!-- logo for regular state and mobile devices -->
-            <span class="logo-lg">
-                
-                <b><?php echo $title;?></span>
-        </a>
         <!-- Header Navbar: style can be found in header.less -->
-        <nav class="navbar navbar-static-top">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <!-- Logo -->
+            <a href="<?=base_url()?>index.php/dashboard" class="logo">
+                <!-- mini logo for sidebar mini 50x50 pixels -->
+                <span class="logo-mini"><b>K</b>UMS</span>
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg">
+                    
+                    <b><?php echo $title;?></span>
+            </a>
             <!-- Sidebar toggle button-->
             <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
                 <span class="sr-only">Toggle navigation</span>
             </a>
-
+        <!--    <div class="navbar-brand">
+                <span class="hidden-xs">Warehouse 1</span>
+            </div> -->
             <div class="navbar-custom-menu">
                 <ul class="nav navbar-nav">
-
+ 
                     <!-- User Account: style can be found in dropdown.less -->
                     <li class="dropdown user user-menu">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             <img src="<?=base_url()?>assets/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
-                            <span class="hidden-xs"><?=$this->session->userdata('employee');?></span>
                         </a>
                         <ul class="dropdown-menu">
                             <!-- User image -->
+                            
                             <li class="user-header">
                                 <img src="<?=base_url()?>assets/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
 
                                 <p>
                                     <?php echo $this->session->userdata('employee');?>
-
                                 </p>
                             </li>
                             <!-- Menu Footer-->
@@ -103,35 +105,22 @@
     <!-- Left side column. contains the logo and sidebar -->
     <aside class="main-sidebar">
         <!-- sidebar: style can be found in sidebar.less -->
-        <section class="sidebar">
+        <section class="sidebar tab-column">
             <!-- Sidebar user panel -->
-<!--             <div class="user-panel">
-                <div class="pull-left image">
-                    <img src="<?=base_url()?>assets/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
-                </div>
-                <div class="pull-left info">
-                    <p><?php echo $this->session->userdata('employee');?></p>
-                </div>
-            </div> -->
+
 
             <!-- sidebar menu: : style can be found in sidebar.less -->
             <ul class="sidebar-menu" data-widget="tree">
-                <li class="header">MAIN NAVIGATION</li>
-                <li class="treeview">
-                    <a href="#" class="nav-link nav-toggle">
+                <?php if ($this->session->userdata('parent_name') == '') { 
+                        $class = 'menu-open';
+                    ?>
+                    <li class=" <?php echo $class; ?>">
+                <?php } else { ?>
+                    <li>
+                <?php } ?>
+                    <a href="<?=base_url()?>index.php/dashboard" class="nav-link ">
                         <i class="fa fa-dashboard"></i> <span>Dashboard</span>
-                        <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
                     </a>
-                    <ul class="treeview-menu">
-                        <li class="nav-item active">
-                            <a href="<?=base_url()?>dashboard" class="nav-link ">
-                                <span class="title">Dashboard</span>
-                            </a>
-                        </li>
-                    </ul>
-
 
                 </li>
                 <?php foreach ($parent_nav as $prow): ?>
@@ -149,7 +138,7 @@
                     } else {
                         echo base_url() . $prow->MENU_URL;
                     } ?>" class="nav-link nav-toggle">
-                        <i class="fa fa-folder"></i>
+                        <i class="<?php echo $prow->icon; ?>"></i>
                         <span class="title"><?php echo $prow->MENU_TEXT; ?></span>
                         <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
@@ -186,10 +175,9 @@
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
-        <section class="content-header">
+      <section class="content-header">
             <?php $My_Controller->Getsave_up_delPermissions(); ?>
             <h1>
-
                 <small></small>
             </h1>
 
@@ -215,15 +203,15 @@
                 <?php } else { ?>
 
                     <li>
-                        <a href="<?= base_url(); ?>dashboard"><i class="icon-home"></i></a><span
+                        <a href="<?= base_url(); ?>dashboard"><i class="icon-home"></i>Dashboard</a><span
                                 class="divider">&nbsp;</span>
                     </li>
 
                     <?php if ($this->session->userdata('child_name')) { ?>
 
                         <li>
-                            <?php echo $this->session->userdata('parent_name'); ?>
-                            <i class="fa fa-angle-right"></i>
+                        <a href="<?php echo $this->session->userdata('parent_url'); ?>"><i class="icon-home"></i><?php echo $this->session->userdata('parent_name'); ?></a>
+                            <!-- <i class="fa fa-angle-right"></i> -->
                         </li>
                         <li>
                             <a style="color: green; font-weight: bold; font-style: normal"

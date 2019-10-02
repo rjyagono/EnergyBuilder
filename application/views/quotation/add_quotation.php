@@ -374,9 +374,7 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-                    $('.datepicker').datepicker({
-                        autoclose: true
-                    })
+ 
         var base_url = "<?=base_url()?>";
         // $(".demo-select2-2").select2({
         //     dir:"ltr"

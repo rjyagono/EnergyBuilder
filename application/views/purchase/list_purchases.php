@@ -4,12 +4,12 @@
         <div class="box light bordered">
             <div class="box-body">
                 <div class="clearfix">
-                    <input type="hidden" name="purchase_code" class="form-control input-medium"
-                           value="<?php echo $purchase_no; ?>"/>
+                    <input type="hidden" name="purchase_id" class="form-control input-medium"
+                           value="<?php echo $purchase_id; ?>"/>
 
 
                     <div class="col-md-3">
-                        <label>Supplier Name:</label>
+                        <label>Vendor Name:</label>
                         <select class="form-control input-medium" name="vendor_id" id="vendor_id" required>
                             <option value="">SELECT VENDORS</option>
                             <?php foreach ($vendors as $vendor) : ?>
@@ -22,25 +22,27 @@
 
                     <div class="col-md-3">
 
-                        <label>Company Name:</label>
-                        <select class="form-control input-medium" name="company_id" id="company_id" required>
-                            <option value="">SELECT COMPANY</option>
-                            <?php foreach ($companies as $company) : ?>
+                        <label>Deliver To:</label>
+                        <select class="form-control input-medium" name="warehouse_id" id="warehouse_id" required>
+                            <option value="">SELECT WAREHOUSE</option>
+                            <?php foreach ($warehouses as $warehouse) : ?>
                                 <option
-                                    value="<?php echo $company->company_id ?>"><?php echo $company->company_name; ?></option>
+                                    value="<?php echo $warehouse->warehouse_id ?>"><?php echo $warehouse->warehouse_name; ?></option>
                             <?php endforeach; ?>
                         </select>
 
                     </div>
                     <div class="col-md-3">
-
-
                         <label>Purchase Date</label>
                         <input type="text" name="purchase_date"
                                class="form-control input-medium datepicker"
                                required="required"/>
-
-
+                    </div>
+                    <div class="col-md-3">
+                        <label>Expected Delivery Date</label>
+                        <input type="text" name="delivery_date"
+                               class="form-control input-medium datepicker"
+                               required="required"/>
                     </div>
                 </div>
 
@@ -78,8 +80,7 @@
 
 
                     <div>
-                        <table cellspacing="0" border="1" style="font-size:11px;border-collapse:collapse;"
-                               id="" class="table table-striped table-hover" rules="all">
+                        <table class="table table-striped table-hover" rules="all">
                             <thead>
                             <tr>
                                 <th>#</th>

@@ -8,6 +8,7 @@ class Main_model extends MY_Model
     {
         parent::__construct();
        // $this->cms_db = $this->load->database('forum', TRUE);
+        $this->_warehouse_id = $this->session->userdata('warehouse_id');
     }
 
     public function test()
@@ -16,9 +17,9 @@ class Main_model extends MY_Model
         $query = $this->cms_db->query($sql);
         return $query->result_array();
     }
+
     function bps_table($table, $pr_key)
     {
-
 
         $this->_table_name = $table;
         $this->_primary_key = $pr_key;
@@ -48,18 +49,24 @@ class Main_model extends MY_Model
     // add record
     function add_record($table, $array_data)
     {
+        $array_data['created_at'] = date('Y-m-d');
         $query = $this->db->insert($table, $array_data);
+
         if ($query == 1)
-            return $query;
+            return $this->db->insert_id();
         else
             return false;
     }
 
     //update record
-    function update_record($table, $update, $id)
+    function update_record($table, $array_data, $id)
     {
+        $array_data['updated_at'] = date('Y-m-d');
         $this->db->where($id);
-        $query = $this->db->update($table, $update);
+        $query = $this->db->update($table, $array_data);
+        // echo $this->db->last_query();
+        // echo $this->db->insert_id();
+        // exit;
         if ($this->db->affected_rows() > 0)
             return true;
         else
@@ -71,8 +78,9 @@ class Main_model extends MY_Model
     {
         $query = $this->db->where($field_name, $id);
         $this->db->delete($table);
+
         if ($query != NULL)
-            return $query;
+            return true;
         else
             return false;
     }
@@ -101,7 +109,11 @@ class Main_model extends MY_Model
         $q = $this->db->get($table);
 
 
-        return $q->row_array();
+        // echo $this->db->last_query();
+        // //echo $this->db->insert_id();
+        // exit;
+
+        return $q->row();
 
     }
 
@@ -128,13 +140,14 @@ class Main_model extends MY_Model
     }
 
     //get same name products
-    public function select_same($item_name, $color, $size, $art_no)
+    public function select_same($item_name, $color, $size, $art_no, $article_no = '')
     {
         $this->db->select('*');
         $this->db->where('item_name', $item_name);
-        $this->db->where('color', $color);
-        $this->db->where('size', $size);
-        $this->db->where('article_no', $art_no);
+        $this->db->where('article_no', $article_no);
+        // $this->db->where('color', $color);
+        // $this->db->where('size', $size);
+        // $this->db->where('article_no', $art_no);
         $query = $this->db->get("item");
         //echo $this->db->last_query();
         $result = $query->num_rows();
@@ -152,9 +165,12 @@ class Main_model extends MY_Model
                     i.item_name,
                     i.color,
                     i.article_no,
+                    i.description,
                     i.category_id,
                     i.size,
                     i.flag,
+                    i.unit,
+                    i.stock_limit,
                     i.purchase_rate,
                     c.category_name,
                     s.stock_no,
@@ -166,7 +182,7 @@ class Main_model extends MY_Model
                     s.category_id")
             ->FROM('item AS i,category as c, stock as s')
             ->where('i.category_id = c.category_id')
-            ->where('s.item_id = i.item_id')->where('c.category_id = s.category_id')
+            ->where('s.item_id = i.item_id')->where('c.category_id = s.category_id')->where('s.warehouse_id', $this->_warehouse_id)
             ->where('i.category_id = c.category_id')
             ->get();
 
@@ -186,24 +202,24 @@ class Main_model extends MY_Model
     public function get_purchased($item_id)
     {
         $sql = $this->db->query("SELECT
-item.item_id,
-item.item_name,
-item.size,
-item.flag,
-item.color,
-item.purchase_rate,
-category.category_id,
-category.category_name,
-stock.stock_no,
-stock.stock_qty,
-stock.purchase_rate,
-stock.stock_rate
-FROM
-item
-INNER JOIN category ON item.category_id = category.category_id
-INNER JOIN stock ON stock.item_id = item.item_id AND stock.category_id = category.category_id
-WHERE item.item_id=$item_id
-");
+                item.item_id,
+                item.item_name,
+                item.size,
+                item.flag,
+                item.color,
+                item.purchase_rate,
+                category.category_id,
+                category.category_name,
+                stock.stock_no,
+                stock.stock_qty,
+                stock.purchase_rate,
+                stock.stock_rate
+                FROM
+                item
+                INNER JOIN category ON item.category_id = category.category_id
+                INNER JOIN stock ON stock.item_id = item.item_id AND stock.category_id = $this->_warehouse_id
+                WHERE item.item_id=$item_id
+                ");
         return $sql->row();
     }
 
@@ -211,25 +227,25 @@ WHERE item.item_id=$item_id
     public function get_product_details_v2($item_id)
     {
         $sql = $this->db->query("SELECT
-item.item_id,
-item.item_name,
-item.size,
-item.flag,
-item.color,
-item.purchase_rate,
-category.category_id,
-category.category_name,
-stock.stock_no,
-stock.stock_qty,
-stock.purchase_rate,
-stock.stock_rate
-FROM
-item
-INNER JOIN category ON item.category_id = category.category_id
-INNER JOIN stock ON stock.item_id = item.item_id AND stock.category_id = category.category_id
-WHERE item.item_id=$item_id
-");
-        // echo $this->db->last_query();
+                item.item_id,
+                item.item_name,
+                item.size,
+                item.flag,
+                item.color,
+                item.purchase_rate,
+                category.category_id,
+                category.category_name,
+                stock.stock_no,
+                stock.stock_qty,
+                stock.purchase_rate as stock_purchase_rate,
+                stock.stock_rate
+                FROM
+                item
+                INNER JOIN category ON item.category_id = category.category_id
+                INNER JOIN stock ON stock.item_id = item.item_id AND stock.warehouse_id = $this->_warehouse_id
+                WHERE item.item_id=$item_id
+                ");
+        //echo $this->db->last_query();
         return $sql->row();
     }
 
@@ -254,23 +270,23 @@ WHERE item.item_id=$item_id
     }
 
     // check stock
-    public function check_stock_record($item, $category)
+    public function check_stock_record($item, $warehouse_id)
     {
         $query = $this->db->select('*');
         $this->db->from('stock');
         $this->db->where('item_id', $item);
-        $this->db->where('category_id', $category);
+        $this->db->where('warehouse_id', $warehouse_id);
         $query = $this->db->get();
         return $query->num_rows();
     }
 
     // get stock quantity
-    public function get_stock_qty($item, $category)
+    public function get_stock_qty($item, $warehouse_id)
     {
         $this->db->select('*');
         $this->db->from('stock');
         $this->db->where('item_id', $item);
-        $this->db->where('category_id', $category);
+        $this->db->where('warehouse_id', $warehouse_id);
         $query = $this->db->get();
         return $query->row();
 
@@ -279,32 +295,29 @@ WHERE item.item_id=$item_id
     // get all purchases
     public function select_purchases()
     {
-        $query = $this->db->select("
-purchase_company.purchase_no,
-purchase_company.purchase_date,
-purchase_company.vendor_id,
-vendor.vendor_id,
-vendor.vendor_name,
-usr_user.USER_NAME,
-purchase_company.grand_total,purchase_company.due_amount")
-            ->from('vendor,purchase_company, usr_user')
-            ->where('purchase_company.vendor_id = vendor.vendor_id')
-            ->where('usr_user.USER_ID` = purchase_company.purchase_user_id')->get();
-			
+        $this->db->select("
+                purchase.purchase_id,
+                purchase.purchase_date,
+                purchase.vendor_id,
+                purchase.status,
+                purchase.delivery_date,
+                purchase.pur_no,
+                vendor.vendor_id,
+                vendor.vendor_name,
+                usr_user.USER_NAME,
+                purchase.grand_total,
+                purchase.due_amount")
+            ->from('vendor,purchase, usr_user')
+            ->where('purchase.vendor_id = vendor.vendor_id')
+            ->where('usr_user.USER_ID` = purchase.user_id');
+
+            $query = $this->db->get();
+
         return $query->result();
     }
 
     // get maximum purchase no
     public function get_purchase_max()
-    {
-        $this->db->select_max('purchase_no');
-        $q = $this->db->get('purchase_company');
-        $data = $q->row();
-        return $data;
-    }
-
-    // get max purchase id
-    public function get_purchase_max1()
     {
         $this->db->select_max('purchase_id');
         $q = $this->db->get('purchase');
@@ -312,32 +325,39 @@ purchase_company.grand_total,purchase_company.due_amount")
         return $data;
     }
 
-    // get history of purchases
-    public function get_purchaseHistory($purchaseNO)
+    // get max purchase id
+    public function get_purchase_max1()
     {
-        $this->db->select('purchase.purchase_no,
-purchase.purchase_qty,
-purchase.purchase_amount,
-item.item_id,
-item.item_name,
-vendor.vendor_id,
-vendor.vendor_name,
-purchase.purchase_id,
-purchase.purchase_qty,
-purchase.purchase_amount,
-item.purchase_rate,
-purchase_company.purchase_date,
-purchase_company.purchase_amount_total,
-purchase_company.vendor_id,
-`purchase_company`.`due_amount`,
-`purchase_company`.`grand_total`')
-            ->from('item,purchase,purchase_company,vendor')
-            ->where('item.item_id = purchase.item_id')
-            ->where('purchase_company.purchase_no=purchase.purchase_no')
-            ->where('purchase_company.vendor_id=vendor.vendor_id')
-            ->where('purchase.purchase_no', $purchaseNO);
+        $this->db->select_max('purchase_detail_id');
+        $q = $this->db->get('purchase_details');
+        $data = $q->row();
+        return $data;
+    }
+
+    // get history of purchases
+    public function get_purchaseHistory($purchaseID)
+    {
+        $this->db->select('purchase_details.purchase_id,
+                    purchase_details.purchase_qty,
+                    purchase_details.purchase_amount,
+                    item.item_id,
+                    item.item_name,
+                    vendor.vendor_id,
+                    vendor.vendor_name,
+                    purchase_details.purchase_rate,
+                    purchase.purchase_date,
+                    purchase.purchase_amount_total,
+                    purchase.vendor_id,
+                    purchase.due_amount,
+                    purchase.grand_total')
+            ->from('item,purchase,purchase_details,vendor')
+            ->where('item.item_id = purchase_details.item_id')
+            ->where('purchase.purchase_id=purchase_details.purchase_id')
+            ->where('purchase.vendor_id=vendor.vendor_id')
+            ->where('purchase_details.purchase_id', $purchaseID);
         $query = $this->db->get();
-        // echo $this->db->last_query();
+        //echo $this->db->last_query();
+
         return $query->result();
     }
 
@@ -345,22 +365,22 @@ purchase_company.vendor_id,
     public function items($item)
     {
         $sql = $this->db->select("
-i.item_id,
-i.item_name,
-i.color,
-i.article_no,
-i.category_id,
-i.size,
-i.flag,
-i.purchase_rate,
-c.category_name,
-s.stock_no,
-s.item_id,
-s.stock_qty,
-s.purchase_rate,
-s.stock_rate,
-c.category_id,
-s.category_id")
+                    i.item_id,
+                    i.item_name,
+                    i.color,
+                    i.article_no,
+                    i.category_id,
+                    i.size,
+                    i.flag,
+                    i.purchase_rate,
+                    c.category_name,
+                    s.stock_no,
+                    s.item_id,
+                    s.stock_qty,
+                    s.purchase_rate,
+                    s.stock_rate,
+                    c.category_id,
+                    s.category_id")
             ->from('item AS i,category as c, stock as s')
             ->where('i.category_id = c.category_id')
             ->where('s.item_id = i.item_id')->where('c.category_id = s.category_id')
@@ -370,13 +390,78 @@ s.category_id")
     }
 
     // get category wise stock
-    public function stock_cat()
+    public function stock_cat($warehouse_id='')
     {
-        $query = $this->db->select()->FROM('stock as s,item as i, category as c')
-            ->WHERE('s.item_id=i.item_id')
-            ->where('s.category_id=i.category_id')
-            ->where("i.category_id=c.category_id")->get();
+        $this->db->select('stock.*, A.*, I.*, C.category_name');
+        $this->db->from('stock');
+        $this->db->join('category AS C', 'C.category_id = stock.category_id', 'LEFT');
+        $this->db->join('warehouses AS A', 'A.warehouse_id = stock.warehouse_id');
+        $this->db->join('item AS I', 'I.item_id = stock.item_id');
+
+        if ($warehouse_id != '') {
+            $this->db->where("stock.warehouse_id", $this->_warehouse_id);
+        }
+
+        $query = $this->db->get();
+
+        // echo $this->db->last_query();
+        // exit;
+
         return $query->result();
+    }
+
+    public function ajax_stock_cat($searchValue, $warehouse_id)
+    {
+
+        $this->db->select('I.item_id,I.item_name, C.category_name, stock.stock_qty, stock.purchase_rate, stock.stock_rate, stock.stock_no');
+        $this->db->from('stock');
+        $this->db->join('category AS C', 'C.category_id = stock.category_id', 'LEFT');
+        $this->db->join('warehouses AS A', 'A.warehouse_id = stock.warehouse_id');
+        $this->db->join('item AS I', 'I.item_id = stock.item_id');
+
+        if ($warehouse_id == 0) {
+            $this->db->where("stock.warehouse_id", $this->_warehouse_id);
+        } else {
+            $this->db->where("stock.warehouse_id", $warehouse_id);
+        }
+
+
+        if($searchValue != ''){
+            $this->db->where(" (I.item_name like '%".$searchValue."%' or 
+              C.category_name like '%".$searchValue."%' or 
+              I.item_id like'%".$searchValue."%' ) "); 
+        }
+
+        $query = $this->db->get();
+
+        $data = [];
+
+        foreach($query->result() as $r) {
+           $data[] = array(
+                $r->item_id, 
+                $r->item_name, 
+                $r->category_name, 
+                $r->stock_qty, 
+                $r->purchase_rate, 
+                $r->stock_rate
+                // ,
+                // "<a href='#myModal". $r->stock_no ."' data-toggle='modal'
+                //                    class='btn btn-warning' ". $My_Controller->editPermission ."><i
+                //                         class='fa fa-pencil-square-o'></i>
+                //                 </a>"
+           );
+        }
+
+        $result = array(
+                 "recordsTotal" => $query->num_rows(),
+                 "recordsFiltered" => $query->num_rows(),
+                 "data" => $data
+            );
+
+        // echo $this->db->last_query();
+        // exit;
+
+        return $result;
     }
 
     // get current day invoices
@@ -430,16 +515,18 @@ s.category_id")
     // get recent purchases
     public function recent_purchases()
     {
-        $query = $this->db->select('purchase_company.purchase_no,
-purchase_company.purchase_date,
-purchase_company.vendor_id,
-vendor.vendor_id,
-vendor.vendor_name,
-usr_user.USER_NAME,
-purchase_company.grand_total')->from('vendor, purchase_company,usr_user')
-            ->where('purchase_company.vendor_id = vendor.vendor_id')
-            ->where('usr_user.USER_ID = purchase_company.purchase_user_id')
-            ->order_by('purchase_company.purchase_no', 'DESC')->get();
+        $query = $this->db->select('purchase.purchase_id,
+            purchase.purchase_date,
+            purchase.vendor_id,
+            purchase.status,
+            vendor.vendor_id,
+            vendor.vendor_name,
+            usr_user.USER_NAME,
+            purchase.grand_total')->from('vendor, purchase,usr_user')
+            ->where('purchase.vendor_id = vendor.vendor_id')
+            ->where('usr_user.USER_ID = purchase.user_id')
+            ->order_by('purchase.purchase_id', 'DESC')->get();
+
         return $query->result();
     }
 
@@ -459,13 +546,13 @@ purchase_company.grand_total')->from('vendor, purchase_company,usr_user')
     public function purchases($start_date1, $end_date1)
     {
         $query = $this->db->query("SELECT pc.purchase_date, SUM(pc.purchase_amount_total) AS purchase_amount_total,
-SUM(p.purchase_qty) AS qty, pc.grand_total,pc.pur_no
-FROM purchase_company AS pc, purchase AS p
-WHERE pc.purchase_status =  '1'
-AND pc.purchase_date BETWEEN '$start_date1' AND '$end_date1'
-AND pc.purchase_no = p.purchase_no
-GROUP BY pc.purchase_date
-ORDER BY pc.purchase_no DESC");
+        SUM(p.purchase_qty) AS qty, pc.grand_total,pc.pur_no
+        FROM purchase AS pc, purchase AS p
+        WHERE pc.status =  '1'
+        AND pc.purchase_date BETWEEN '$start_date1' AND '$end_date1'
+        AND pc.purchase_id = p.purchase_id
+        GROUP BY pc.purchase_date
+        ORDER BY pc.purchase_id DESC");
 ///echo $this->db->last_query();
         return $query->result();
     }
@@ -474,26 +561,26 @@ ORDER BY pc.purchase_no DESC");
     public function getSales($start_date1, $end_date1)
     {
         $query = $this->db->query("SELECT 
-  pc.sales_date,
-  SUM(pc.sales_amount_total) AS sales_amount_total,
-  SUM(p.sales_qty) AS sales_qty,
-  pc.grand_total,
-  pc.invoice_no,
-  st.`purchase_rate`,st.`stock_rate`, i.`item_name`,p.sales_no
-FROM
-  sales AS pc,
-  sales_detail AS p,stock AS st,item AS i 
-WHERE pc.sales_status = '1' 
-  AND pc.sales_date BETWEEN '$start_date1' 
-  AND '$end_date1' 
-  AND pc.sales_no = p.sales_no
-  AND st.`item_id` = p.`item_id` 
-  AND i.`item_id` = p.`item_id`
-  AND i.`item_id` = st.`item_id`
-GROUP BY pc.sales_date 
+          pc.sales_date,
+          SUM(pc.sales_amount_total) AS sales_amount_total,
+          SUM(p.sales_qty) AS sales_qty,
+          pc.grand_total,
+          pc.invoice_no,
+          st.`purchase_rate`,st.`stock_rate`, i.`item_name`,p.sales_no
+        FROM
+          sales AS pc,
+          sales_detail AS p,stock AS st,item AS i 
+        WHERE pc.sales_status = '1' 
+          AND pc.sales_date BETWEEN '$start_date1' 
+          AND '$end_date1' 
+          AND pc.sales_no = p.sales_no
+          AND st.`item_id` = p.`item_id` 
+          AND i.`item_id` = p.`item_id`
+          AND i.`item_id` = st.`item_id`
+        GROUP BY pc.sales_date 
 
-ORDER BY pc.sales_no DESC ")->result();
-        return $query;
+        ORDER BY pc.sales_no DESC ")->result();
+                return $query;
     }
 
     // get sale details by sale id
@@ -529,15 +616,15 @@ ORDER BY pc.sales_no DESC ")->result();
     }
 	public function get_invoice_by_date1($start_date, $end_date)
     {
-        $this->db->select('purchase_company.*', false);
+        $this->db->select('purchase.*', false);
         // $this->db->select('sales_detail.*', false);
-        $this->db->from('purchase_company');
+        $this->db->from('purchase');
         //$this->db->join('sales_detail', 'sales_detail.sales_no  =  sales.sales_no', 'left');
         if ($start_date == $end_date) {
-            $this->db->like('purchase_company.purchase_date', $start_date);
+            $this->db->like('purchase.purchase_date', $start_date);
         } else {
-            $this->db->where('purchase_company.purchase_date >=', $start_date);
-            $this->db->where('purchase_company.purchase_date <=', $end_date);
+            $this->db->where('purchase.purchase_date >=', $start_date);
+            $this->db->where('purchase.purchase_date <=', $end_date);
         }
         $query_result = $this->db->get();
         $result = $query_result->result();
@@ -558,7 +645,7 @@ ORDER BY pc.sales_no DESC ")->result();
     }
 	public function p_detail($sales_no)
     {
-        $query = $this->db->select()->from('purchase as sd,item as i, stock as s')
+        $query = $this->db->select()->from('purchase_details as sd,item as i, stock as s')
             ->where('sd.item_id = i.item_id')
             ->where('s.item_id = i.item_id')
             ->where($sales_no)
@@ -603,6 +690,33 @@ ORDER BY pc.sales_no DESC ")->result();
         return $query;
     }
 
+    public  function belowStockLevel(){
+        $this->db->select("COUNT(DISTINCT s.item_id) as count");
+        $this->db->from('stock as s, item as i');
+        $this->db->where('s.item_id = i.item_id AND s.stock_qty < i.stock_limit');
+        $this->db->GROUP_BY('s.item_id');
+
+        $query = $this->db->get()->row();
+        // echo var_dump($query);
+        // echo $this->db->last_query();
+        // exit;
+
+        return $query;
+    }
+
+    public  function StockOnHand(){
+        $this->db->select("COUNT(DISTINCT s.item_id) as count");
+        $this->db->from('stock as s, item as i');
+        $this->db->where('s.item_id = i.item_id');
+        $this->db->GROUP_BY('s.item_id');
+
+        $query = $this->db->get()->row();
+        // echo var_dump($query);
+        // echo $this->db->last_query();
+        // exit;
+
+        return $query;
+    }
 }
 
 

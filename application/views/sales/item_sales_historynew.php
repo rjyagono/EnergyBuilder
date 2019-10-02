@@ -1,35 +1,4 @@
-<script type="text/javascript">
-    function PrintDivold() {
-        var divToPrint = document.getElementById('printableArea');
-        var popupWin = window.open('', '_blank', 'width=300,height=300');
-        popupWin.document.open();
-        popupWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</html>');
-        popupWin.document.close();
-    }
 
-    function PrintDivold(printableArea) {
-
-
-        //$('#dataTables-example').attr('id','none');
-        var printContents = document.getElementById('printableArea').innerHTML;
-        var originalContents = document.body.innerHTML;
-        document.body.innerHTML = printContents;
-        window.print();
-        //$('table').attr('id','dataTables-example');
-        location.reload(document.body.innerHTML = originalContents);
-        //document.body.innerHTML = originalContents;
-    }
-
-
-    function PrintDiv() {
-        var divToPrint = document.getElementById('printableArea');
-
-        var popupWin = window.open('', '_blank', 'width=750,height=600');
-        popupWin.document.open();
-        popupWin.document.write('<html><head>');
-        popupWin.document.write('<html><style type="text/css" media="print">@page { size:4.5in 11in; margin: 2cm; width: 25mm;height: 97mm;  #invoice h1 {font-size: 6.0em; color: red;} }</style><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
-        popupWin.document.close();
-    }
 </script>
 
 
@@ -86,7 +55,7 @@
                             <thead>
                             <tr>
                                 <th>Serial #</th>
-                                <th>Product</th>
+                                <th>Item</th>
                                 <th>Qty</th>
                                 <th>Price</th>
                                 <th>Subtotal</th>

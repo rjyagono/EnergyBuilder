@@ -180,7 +180,7 @@
                     row.find(".items-carton").val(res.cart_qty);
                     row.find(".rate").val(res.selling_price);
                     row.find(".discount").val(0);
-                    row.find(".supplier_rate").val(res.supplier_price);
+                    row.find(".supplier_rate").val(res.purchase_rate);
                     row.find(".carton").removeAttr('readonly','readonly');
                     do_total(row);
                     do_grand_total();

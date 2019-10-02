@@ -14,7 +14,6 @@
 
 
             <input type="hidden" name="sales_no" class="form-control" value="<?php echo $sales_no; ?>"/>
-            <input type="hidden" name="sales_no" class="form-control" value="<?php echo $sales_no; ?>"/>
             <div class="col-md-3">
                 <div class="sandbox">
                     <label for="select-beast">Customer Name:</label>
@@ -67,9 +66,6 @@
     <div class="col-md-12 ui-sortable">
         <!-- begin panel -->
         <div class="panel panel-success">
-            <div class="panel-heading">
-                <h4 class="panel-title">Select Products To Sale</h4>
-            </div>
             <div class="panel-body">
                 <div class="table-responsive">
                     <div style="" id="">
@@ -78,21 +74,21 @@
                                width="100%">
                             <thead>
                             <tr>
-                                <th>Select Item</th>
-                                <th>Stock/Qty</th>
-                                <th>Quantity</th>
-                                <th>Rate</th>
-                                <th>Discount</th>
-                                <th>Total</th>
-                                <th>Action</th>
+                                <th width="30%">Select Item</th>
+                                <th width="15%">Stock/Qty</th>
+                                <th width="15%">Quantity</th>
+                                <th width="15%">Rate</th>
+                                <th width="15%">Discount</th>
+                                <th width="15%">Total</th>
+                                <th width="1%"></th>
                             </tr>
                             </thead>
                             <tbody id="rows-list">
                             <tr>
                                 <td class="product-list">
                                  
-<select class="form-control product input-xlarge" name="product_id[]"
-                            onchange="return get_purchased_data(this.value);">
+                    <select class="form-control product input-xlarge" name="product_id[]"
+                            onchange=" ">
                         <option value="">Add Product</option>
                         <?php foreach ($products as $rows) :
                             ?>
@@ -111,40 +107,31 @@
                                 <td><input type="number" name="discounts[]" class="form-control discount"></td>
                                 <td><input type="number" name="totals[]" class="form-control total" readonly></td>
                                 <td align="center">
-                                    <button type="button" class="btn btn-danger delete-row">
-                                        <i class="fa fa-times"></i>
-                                    </button>
+                                    <a href="#" class="label label-danger delete-row" style="font-size: 100%;">
+                                    <i class="fa fa-trash"></i> </a>
                                 </td>
                             </tr>
                             </tbody>
                             <tfoot>
                             <tr>
-                                <td style="text-align:right;" colspan="6">
+                                <td style="text-align:right;" colspan="5">
                                     <strong style="color: inherit;">Total Discount:</strong>
                                 </td>
                                 <td class="text-right">
                                     <input type="text" id="total_discount" class="form-control" name="total_discount"
                                            tabindex="" value="0.00" readonly="readonly">
                                 </td>
-                                <td></td>
                             </tr>
                             <tr>
-                                <td colspan="6" style="text-align:right;">
+                                <td colspan="5" style="text-align:right;">
                                     <strong style="color: inherit;">Grand Total:</strong>
                                 </td>
                                 <td class="text-right">
                                     <input type="text" id="grand_total" tabindex="" class="form-control"
                                            name="total_amount" value="0.00" readonly="readonly">
                                 </td>
-                                <td></td>
                             </tr>
                             <tr>
-                                <td align="center">
-                                    <button type="button" id="add-invoice-item" class="btn btn-success valid"
-                                           name="add-invoice-item"
-                                           onclick="addPurchaseInputField('rows-list');"
-                                            value="" tabindex="9" aria-invalid="false"><i class="fa fa-plus"></i></button>
-                                </td>
                                 <td style="text-align:right;" colspan="5">
                                     <strong style="color: inherit;">Paid Amount:</strong>
                                 </td>
@@ -155,17 +142,21 @@
                                 <td></td>
                             </tr>
                             <tr>
-                                <td align="center">
-                                    <input type="submit" id="add-invoice" class="btn btn-primary" name="add-invoice"
-                                           value="Proceed">
-                                </td>
                                 <td colspan="5" style="text-align:right;">
                                     <strong style="color: inherit;">Due:</strong>
                                 </td>
                                 <td>
                                     <input type="text" id="due_amount" class="form-control" name="due_amount" readonly>
                                 </td>
-                                <td></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="text-align:left;">
+                                    <a class="" href="#" onclick="addPurchaseInputField('rows-list');" >
+                                        <i class="fa fa-plus"></i> Add another line </a>
+                                </td>
+                                <td  style="text-align:right;">
+                                    <input type="submit" id="add-invoice" class="btn btn-primary" name="add-invoice" value="Process Sales">
+                                </td>
                             </tr>
                             </tfoot>
                         </table>
@@ -340,7 +331,8 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $('.datepicker').datepicker({
-            autoclose: true
+            autoclose: true,
+            format: 'yyyy-mm-dd'
         })
         var base_url = "<?=base_url()?>";
         // $(".demo-select2-2").select2({

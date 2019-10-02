@@ -3,9 +3,9 @@
     <div class="col-lg-12">
         <div class="box light bordered">
             <div class="page-header">
-                <h3> List of Vendors 
+                <h3> List of Suppliers 
                     <div class="pull-right">
-                        <a href="#myModal-1" data-toggle='modal' class='btn btn-info'><i class="glyphicon glyphicon-plus"></i> Add New </a>
+                        <a href="#myModal-1" data-toggle='modal' class='btn btn-alert'><i class="glyphicon glyphicon-plus"></i> Add New </a>
                     </div>
                 </h3>
             </div>
@@ -15,10 +15,7 @@
                     <thead>
                     <tr role="row">
                         <th>
-                            VENDOR NAME
-                        </th>
-                        <th>
-                            COMPANY NAME
+                            SUPPLIER NAME
                         </th>
                         <th>ADDRESS</th>
                         <th>
@@ -41,7 +38,6 @@
                         ?>
                         <tr class='odd'>
                             <td><?php echo $results->vendor_name ?></td>
-                            <td><?php echo $results->company_name ?></td>
                             <td><?php echo $results->vendor_address ?></td>
 
                             <td><?php echo $results->phone_no ?></td>
@@ -50,7 +46,7 @@
                             <td><?php echo $results->email ?></td>
                             <td>
                                 <a href='#myModal<?= $results->vendor_id; ?>' data-toggle='modal'
-                                   class='btn btn-sm btn-warning' <?php echo $My_Controller->editPermission;?>
+                                   class='btn btn-sm btn-default' <?php echo $My_Controller->editPermission;?>
                                 ><i class='fa fa-pencil-square-o'></i>
                                 </a>
                             </td>
@@ -74,14 +70,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                    <h4 class="modal-title">Update Vendor</h4>
+                    <h4 class="modal-title">Update Supplier</h4>
                 </div>
                     <?php $attributes = array('class' => 'form-horizontal group-border hover-stripped', 'id' => 'commentForm', 'method' => 'post');
                     echo form_open('vendor/update_vendor', $attributes); ?>
                     <div class="modal-body">
 
                         <div class='form-group'>
-                            <label for='inputEmail1' class='col-lg-3 col-sm-3 control-label'>VENDOR
+                            <label for='inputEmail1' class='col-lg-3 col-sm-3 control-label'>SUPPLIER
                                 NAME</label>
                             <div class='col-lg-9'>
                                 <input class="form-control" type="hidden" name="cid"
@@ -126,27 +122,6 @@
 
                         </div>
 
-                        <div class="form-group">
-                            <lable class="control-label col-lg-3 col-sm-3">
-                                COMPANY
-                            </lable>
-                            <div class="col-lg-9">
-                                <select name="company_id" class="form-control">
-
-                                    <?php foreach ($company as $c) { ?>
-                                        <?php if ($c->company_id == $rows->company_id) { ?>
-                                            <option selected=""
-                                                    value="<?= $c->company_id; ?>"><?= $c->company_name; ?></option><?php } else {
-                                            ?>
-                                            <option
-                                                value="<?= $c->company_id; ?>"><?= $c->company_name; ?></option>
-                                        <?php }
-                                    } ?>
-
-                                </select>
-                            </div>
-                        </div>
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
@@ -175,14 +150,14 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-                            <h4 class="modal-title">ADD VENDOR</h4>
+                            <h4 class="modal-title">ADD SUPPLIER</h4>
                         </div>
                             <?php $attributes = array('class' => 'form-horizontal group-border hover-stripped', 'id' => 'commentForm', 'method' => 'post');
                             echo form_open('vendor/insert_vendor', $attributes); ?>
                         <div class="modal-body modal-edit">
 
                                 <div class='form-group'>
-                                    <label for='inputEmail1' class='col-lg-3 col-sm-3 control-label'>VENDOR NAME</label>
+                                    <label for='inputEmail1' class='col-lg-3 col-sm-3 control-label'>SUPPLIER NAME</label>
                                     <div class='col-lg-9'>
                                         <input type='hidden' name="cid" class='form-control' id='c_' value=''>
                                         <input type='text' name="vendor_name" class='form-control' id='c_name'
@@ -192,7 +167,7 @@
                                 <div class='form-group'>
                                     <label for='inputEmail1' class='col-lg-3 col-sm-3 control-label'>ADDRESS </label>
                                     <div class='col-lg-9'>
-                                        <input class="form-control" type="text" name="vendor_address" value="<?= $rows->vendor_address; ?>">
+                                        <input class="form-control" type="text" name="vendor_address" value="">
                                     </div>
                                 </div>
                                 <div class='form-group'>
@@ -222,21 +197,6 @@
                                                placeholder=''>
                                     </div>
 
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="col-lg-3 col-sm-3 control-label">COMPANY</label>
-                                    <div class="col-lg-9">
-                                        <select name="company_id" class="form-control">
-
-                                            <?php foreach ($company as $c) { ?>
-                                                <option
-                                                    value="<?= $c->company_id; ?>"><?= $c->company_name; ?></option>
-                                                <?php
-                                            } ?>
-
-                                        </select>
-                                    </div>
                                 </div>
                         </div>
 

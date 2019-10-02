@@ -8,15 +8,77 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.7 -->
     <link rel="stylesheet" href="<?= base_url(); ?>assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="<?= base_url(); ?>assets/bower_components/font-awesome/css/font-awesome.min.css">
-    <!-- Ionicons -->
-    <link rel="stylesheet" href="<?= base_url(); ?>assets/bower_components/Ionicons/css/ionicons.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="<?= base_url(); ?>assets/dist/css/main.min.css">
-    <!-- iCheck -->
-    <link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/iCheck/square/blue.css">
+ 
+    <link rel="stylesheet" href="<?= base_url(); ?>assets/animate.css">
+    <style type="text/css">
+        html, body {
+            height: 100%;
+        }
+        body {
+            font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+            font-weight: 400;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        .login-logo,
+        .register-logo {
+         font-size:35px;
+         text-align:center;
+         margin-bottom:25px;
+         font-weight:300
+        }
+        .login-logo a,
+        .register-logo a {
+         color:#444;
+        }
+        .login-page,
+        .register-page {
+         background: #18a689 ;
+        }
+        .login-box,
+        .register-box {
+         width:360px;
+         margin:7% auto
+        }
+        @media (max-width:768px) {
+         .login-box,
+         .register-box {
+          width:90%;
+          margin-top:20px
+         }
+        }
+        .login-box-body,
+        .register-box-body {
+         background:#fff;
+         padding:20px;
+         border-top:0;
+         color:#666;
+        }
+        .login-box-body .form-control-feedback,
+        .register-box-body .form-control-feedback {
+         color:#777
+        }
+        .login-box-msg,
+        .register-box-msg {
+         margin:0;
+         text-align:center;
+         padding:0 20px 20px 20px
+        }
 
+        .login-page {
+            background: #003eaa;
+            background: linear-gradient(148deg,#c7216a 7%,#fda41e 100%);
+            height: 28px;
+            color: #fff;
+            text-align: center;
+            font-size: 1.25em;
+            padding: 3px 0;
+        }
+
+        .login-box-body, .register-box-body {
+            background: transparent; 
+        }
+    </style>
 
 </head>
 <body class="hold-transition login-page">
@@ -31,36 +93,31 @@
 
     } ?>
     <div class="login-box-body">
-        <p class="login-box-msg">Sign in to start your session</p>
-
-        <?php $attributes = array('class' => 'email', 'id' => 'myform', 'method' => 'post');
-        echo form_open('users/loginauthen', $attributes); ?>
-        <div class="form-group has-feedback">
-            <input type="text" class="form-control" name="u_email" placeholder="Username">
-            <span class="glyphicon glyphicon-user form-control-feedback"></span>
+        <div class="login-logo animated fadeInDown" data-animation="fadeInDown">
+            <a href="http://multi-inventory.codeslab.net/"><b>EBATECH </b>Inventory </a>
         </div>
-        <div class="form-group has-feedback">
-            <input type="password" class="form-control" name="u_password" autocomplete="off" placeholder="Password">
-            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-        </div>
-        <div class="row">
-            <div class="col-xs-8">
-                <div class="checkbox icheck">
-                    <label>
-                        <input type="checkbox"> Remember Me
-                    </label>
+        <div class="login-box-body  animated fadeInUp" data-animation="fadeUp">
+            <?php $attributes = array('class' => 'form-group', 'id' => 'myform', 'method' => 'post');
+                echo form_open('users/loginauthen', $attributes); ?>
+            <div class="form-group has-feedback">
+                <input type="text" class="form-control" name="u_email" placeholder="Username">
+                <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" class="form-control" name="u_password" autocomplete="off" placeholder="Password">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="row">
+                <!-- /.col -->
+                <div class="col-xs-12">
+                    <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
                 </div>
-            </div>
-            <!-- /.col -->
-            <div class="col-xs-4">
-                <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
-            </div>
-            <!-- /.col -->
+                <!-- /.col -->
+                </div>
+            <?php form_close(); ?>
         </div>
-        <?php form_close(); ?>
 
-
-        <a href="<?= base_url('users/register') ?>" class="text-center">Register a new membership</a>
+        <!-- <a href="<?= base_url('users/register') ?>" class="text-center">Register a new membership</a> -->
         <hr>
         <p><strong>Username:</strong> admin | <strong>Password:</strong> 123admin</p>
     </div>

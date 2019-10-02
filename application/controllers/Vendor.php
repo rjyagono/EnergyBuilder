@@ -9,13 +9,8 @@ class Vendor extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-
-        if ($this->session->userdata('user_id')) {
-        } else {
-            
-            redirect(base_url() . 'index.php/Users/login');
-
-        }
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
     }
 
     // Vendor Add Form
@@ -40,14 +35,12 @@ class Vendor extends MY_Controller
     public function list_vendors()
     {
         $this->vend_index();
-        $dat = array("company " => " company.company_id  = vendor.company_id");
-        $data['vendor'] = $this->Main_model->get_join($dat);
-        $data['company'] = $this->Main_model->select('company');
+        //$dat = array("company " => " company.company_id  = vendor.company_id");
+        $data['vendor'] = $this->Main_model->select('vendor');
+        //$data['company'] = $this->Main_model->select('company');
         $this->header($title = 'Vendors List');
         $this->load->view('vendor/list_vendor', $data);
         $this->footer();
-
-
     }
 
     // Insert new Vendor to Database
@@ -58,14 +51,12 @@ class Vendor extends MY_Controller
             'vendor_address' => $this->input->post("vendor_address"),
             'phone_no' => $this->input->post("phone_no"),
             'fax_no' => $this->input->post("fax_no"),
-            'email' => $this->input->post("email"),
-            'company_id' => $this->input->post("company_id"),
-
+            'email' => $this->input->post("email")
         );
-        $this->load->model('Main_model');
+        
         $response = $this->Main_model->add_record('vendor', $data);
         if ($response) {
-            $this->session->set_flashdata('success', 'Record added Successfully..!');
+            $this->session->set_flashdata('success', 'Record added Successfully!');
             redirect(base_url() . 'index.php/Vendor/list_vendors');
         }
     }
@@ -80,17 +71,16 @@ class Vendor extends MY_Controller
             'vendor_address' => $this->input->post("vendor_address"),
             'phone_no' => $this->input->post('phone_no'),
             'fax_no' => $this->input->post('fax_no'),
-            'email' => $this->input->post('email'),
-            'company_id' => $this->input->post('company_id')
+            'email' => $this->input->post('email')
         );
 
         $where = array('vendor_id' => $comp_id);
-        $this->load->model('Main_model');
+     
         $response = $this->Main_model->update_record('vendor', $comp_info, $where);
-        if ($response) {
-            $this->session->set_flashdata('update', 'Record Updated Successfully..!');
+        //if ($response) {
+            $this->session->set_flashdata('info', 'Record Updated Successfully!');
             redirect(base_url() . 'index.php/Vendor/list_vendors');
-        }
+        //}
     }
 
 

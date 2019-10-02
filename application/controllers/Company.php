@@ -9,13 +9,8 @@ class Company extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        if ($this->session->userdata('user_id')) {
-        } else {
-
-
-            redirect(base_url() . 'index.php/Users/login');
-
-        }
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
 
     }
 
@@ -61,7 +56,7 @@ class Company extends MY_Controller
             'fax_no' => $this->input->post("fax_no"),
             'email' => $this->input->post("email"),
         );
-        $this->load->model('Main_model');
+
         $response = $this->Main_model->add_record('company', $data);
         if ($response) {
             $this->session->set_flashdata('success', 'Record added Successfully..!');
@@ -84,9 +79,15 @@ class Company extends MY_Controller
         $where = array('company_id' => $comp_id);
         $this->load->model('Main_model');
         $response = $this->Main_model->update_record('company', $comp_info, $where);
+
+        // echo $this->db->last_query();
+        // exit;
         if ($response) {
-            $this->session->set_flashdata('update', 'Record Updated Successfully..!');
+            $this->session->set_flashdata('info', 'Record Updated Successfully..!');
+            redirect(base_url() . 'index.php/company/list_company');
+        } else {
             redirect(base_url() . 'index.php/company/list_company');
         }
+
     }
 }

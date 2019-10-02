@@ -10,13 +10,7 @@ class Category extends MY_Controller
     {
         parent::__construct();
         //Check if user is logged in or id exists in session
-        if ($this->session->userdata('user_id')) {
-
-        } else {
-
-            redirect(base_url() . 'index.php/Users/login');
-
-        }
+        $this->checkUserSession();
     }
 
     // List Categories

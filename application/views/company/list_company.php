@@ -8,15 +8,14 @@
                 <div class="page-header">
                     <h3> List of Companies 
                         <div class="pull-right">
-                            <a href="#myModal-1" data-toggle='modal' class='btn btn-info'><i class="glyphicon glyphicon-plus"></i> Add New </a>
+                            <a href="#myModal-1" data-toggle='modal' class='btn btn-alert'><i class="glyphicon glyphicon-plus"></i> Add New </a>
                         </div>
                     </h3>
                 </div>
 
             </div>
-            <div class="box-body">
-                <table class="table table-striped table-hover table-bordered dataTable" id=""
-                       aria-describedby="editable-sample_info">
+            <div class="box-body dataTables_wrapper form-inline dt-bootstrap">
+                <table class="table table-striped table-hover table-bordered dataTable" id="example1">
                     <thead>
                     <tr role="row">
                         <th class="sorting_disabled" role="columnheader" rowspan="1" colspan="1" aria-label="Username">
@@ -39,7 +38,7 @@
                         </th>
                         <th class="sorting" role="columnheader" tabindex="0" aria-controls="editable-sample" rowspan="1"
                             colspan="1" aria-label="Delete: activate to sort column ascending">
-                            Delete
+                            
                         </th>
                     </tr>
                     </thead>
@@ -63,9 +62,8 @@
                         <td>
                             <a href='#myModal<?= $results->company_id ?>'
                                data-toggle='modal' <?php echo $My_Controller->editPermission; ?>
-                               class='btn btn-warning'><i
+                               class='btn btn-default'><i
                                     class='fa fa-pencil-square-o'></i>
-                                Edit
                             </a>
                         </td>
                         <?php } ?>

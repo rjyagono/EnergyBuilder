@@ -7,21 +7,21 @@
             <!-- Profile Image -->
             <div class="box box-primary">
                 <div class="box-body box-profile">
-                    <?php if($empDetail['EMP_PIC'] != ''){?>
-                    <img class="profile-user-img img-responsive img-circle" src="<?php echo base_url().$empDetail['EMP_PIC']; ?>">
+                    <?php if($empDetail->EMP_PIC != ''){?>
+                    <img class="profile-user-img img-responsive img-circle" src="<?php echo base_url().$empDetail->EMP_PIC; ?>">
                     <?php }else{?>
-                        <img class="profile-user-img img-responsive img-circle" src='<?= base_url() . '/' . "uploads/images/no_avatar.jpg" ?>'>
+                        <img class="profile-user-img img-responsive img-circle" src='<?= base_url() . '/' . "assets/dist/img/no_avatar.png" ?>'>
                     <?php }?>
-                    <h3 class="profile-username text-center"><?php echo $empDetail['EMP_NAME']; ?></h3>
+                    <h3 class="profile-username text-center"><?php echo $empDetail->EMP_NAME; ?></h3>
 
-                    <p class="text-muted text-center"><?php echo $empDetail['EMP_EMAIL']; ?></p>
+                    <p class="text-muted text-center"><?php echo $empDetail->EMP_EMAIL; ?></p>
 
                     <ul class="list-group list-group-unbordered">
                         <li class="list-group-item">
-                            <b>Gender</b> <a class="pull-right"><?php echo $empDetail['EMP_GENDER']; ?></a>
+                            <b>Gender</b> <a class="pull-right"><?php echo $empDetail->EMP_GENDER; ?></a>
                         </li>
                         <li class="list-group-item">
-                            <b>Regiteration date</b> <a class="pull-right"><?php echo date('d M,Y',strtotime($empDetail['EMP_DATE'])); ?></a>
+                            <b>Regiteration date</b> <a class="pull-right"><?php echo date('d M,Y',strtotime($empDetail->EMP_DATE)); ?></a>
                         </li>
 
                     </ul>
@@ -48,7 +48,7 @@
                         <?php if(empty($empDetail)){
                             echo "<span>NO record</span>";
                         }else{
-                            echo $empDetail['EMP_PHONE'];} ?>
+                            echo $empDetail->EMP_PHONE;} ?>
                     </p>
 
                     <hr>
@@ -58,7 +58,7 @@
                     <p class="text-muted"> <?php if(empty($empDetail)){
                             echo "<span>NO record</span>";
                         }else{
-                            echo $empDetail['EMP_CELL'];} ?>a</p>
+                            echo $empDetail->EMP_CELL;} ?>a</p>
 
                     <hr>
 
@@ -67,7 +67,7 @@
                     <p> <?php if(empty($empDetail)){
                             echo "<span>NO record</span>";
                         }else{
-                            echo $empDetail['EMP_ADDRESS'];} ?></p>
+                            echo $empDetail->EMP_ADDRESS;} ?></p>
                 </div>
                 <!-- /.box-body -->
             </div>

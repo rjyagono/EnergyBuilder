@@ -9,14 +9,8 @@ class Customer extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        if ($this->session->userdata('user_id')) {
-        } else {
-
-
-            redirect(base_url() . 'index.php/Users/login');
-
-        }
-
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
     }
 
 
@@ -70,7 +64,7 @@ class Customer extends MY_Controller
         
         $response = $this->Main_model->add_record('customer', $data);
         if ($response) {
-            $this->session->set_flashdata('msg', 'Customer added Successfully..!');
+            $this->session->set_flashdata('success', 'Customer added Successfully..!');
             redirect(base_url() . 'index.php/customer/list_customers');
         }
     }
@@ -80,18 +74,18 @@ class Customer extends MY_Controller
         $custid = $this->input->post('cid');
 
         $cust_info = array(
-            'customer_name' => $this->input->post('cname'),
-            'phone_no' => $this->input->post('caddress'),
-            'fax_no' => $this->input->post('coldno'),
-            'email' => $this->input->post('ccell')
+            'customer_name' => $this->input->post('customer_name'),
+            'phone_no' => $this->input->post('phone_no'),
+            'fax_no' => $this->input->post('fax_no'),
+            'email' => $this->input->post('email')
         );
 
 
         $where = array('customer_id' => $custid);
-        $this->load->model('Main_model');
+                
         $response = $this->Main_model->update_record('customer', $cust_info, $where);
         if ($response) {
-            $this->session->set_flashdata('msg', 'Customer Updated Successfully..!');
+            $this->session->set_flashdata('info', 'Customer Updated Successfully..!');
             redirect(base_url() . 'index.php/customer/list_customers');
         } else {
             $this->session->set_flashdata('warning', 'Customer didnt updated..!');

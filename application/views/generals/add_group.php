@@ -14,6 +14,10 @@ foreach ($group_list as $grouplists) {
 
 }
 ?>
+<?php if ($this->session->flashdata('message')) {
+    echo "<div class='alert alert-success'>" . $this->session->flashdata('message') . "</div>";
+
+} ?>
 <!-- page start-->
 <div class="row">
     <div class="col-lg-12">

@@ -17,15 +17,8 @@ class generals extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-
-        if ($this->session->userdata('user_id')) {
-            //
-        } else {
-
-
-            redirect(base_url() . 'Users/login');
-
-        }
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
     }
 
     //GET PAGE/CONTROLLER/CONTROLLER-FUNCTION NAME............................
@@ -67,6 +60,7 @@ class generals extends MY_Controller
 
             } else {
                 $this->session->set_userdata("parent_name", $row_r->MENU_TEXT);
+                $this->session->set_userdata("parent_url", base_url() . $row_r->MENU_URL);
             }
 
         }
@@ -93,7 +87,7 @@ class generals extends MY_Controller
 
         foreach ($record as $record) {
 
-            echo $MaxGroup = $record->GROUP_ID;
+            $MaxGroup = $record->GROUP_ID;
         }
 
 
@@ -104,7 +98,7 @@ class generals extends MY_Controller
             "GROUP_NAME" => $group_name
         );
         $this->General->create_record($data, "usr_group");
-        $this->session->set_flashdata('msg', 'Add Successfully');
+        $this->session->set_flashdata('message', 'Add Successfully');
         redirect(base_url() . 'Generals/add_group');
     }
     

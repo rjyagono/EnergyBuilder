@@ -9,16 +9,8 @@ class Sales extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Main_model');
-        if ($this->session->userdata('user_id')) {
-            //
-        } else {
-
-
-            redirect(base_url() . 'index.php/Users/login');
-
-        }
-
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
     }
 
     // creating New Sale Form
@@ -82,6 +74,7 @@ class Sales extends MY_Controller
             $d = 0;
             echo json_encode($d);
         }
+
     }
 
     // Create Invoice
@@ -90,6 +83,9 @@ class Sales extends MY_Controller
         extract($_POST);
         $invoice_id = $this->input->post('invoice_id');
         $date = date('Y-m-d', strtotime($_POST['sales_date']));
+        $warehouse_id = $this->session->userdata('warehouse_id');
+        $user_id = $this->session->userdata('user_id');
+
         $post_data = array(
             'sales_date' => $date,
             'customer_id' => $customer_id,
@@ -122,10 +118,10 @@ class Sales extends MY_Controller
         $data = [];
         foreach ($product_ids as $key => $id) {
             if (strlen($rates[$key]) > 0) {
-                $data1 = $this->Main_model->check_stock_record($id, $category_id[$key]);
+                $data1 = $this->Main_model->check_stock_record($id, $warehouse_id);
 
                 if ($data1 == 1) {
-                    $data = $this->Main_model->get_stock_qty($id, $category_id[$key]);
+                    $data = $this->Main_model->get_stock_qty($id, $warehouse_id);
                     $ids = $data->stock_qty;
                     $new_id = $ids - $cartons[$key];
 
@@ -133,15 +129,15 @@ class Sales extends MY_Controller
                         "stock_qty" => $new_id,
                         "stock_rate" => $rates[$key],
                     );
-                    $where = array('item_id' => $id, 'category_id' => $category_id[$key]);
+                    $where = array('item_id' => $id, 'warehouse_id' => $warehouse_id);
                     $this->Main_model->update_record('stock', $data, $where);
 
                 } else {
                     $data = array(
                         "item_id" => $id,
-                        "category_id" => $category_id[$key],
                         "stock_qty" => $cartons[$key],
                         "stock_rate" => $rates[$key],
+                        "warehouse_id" => $warehouse_id,
                     );
                     $this->Main_model->add_record('stock', $data);
                 }
@@ -153,11 +149,29 @@ class Sales extends MY_Controller
             $row['sales_rate'] = $rates[$key];
             $row['category_id'] = $category_id[$key];
             $row['sales_amount'] = $totals[$key];
-            $data = $row;
-            $res = $this->db->insert("sales_detail", $data);
+            $row['user_id'] = $user_id;
+ 
+            $res = $this->db->insert("sales_detail", $row);
+
+            // log details
+            $this->logger
+                    ->item($row['item_id'])
+                    ->user($row['user_id'])
+                    ->user_name($this->_user_name)
+                    ->transaction_id($row['sales_no'])
+                    ->transaction_date(date('Y-m-d'))
+                    ->warehouse($this->_warehouse_id)
+                    ->type('SO')
+                    ->supplier_customer($post_data['customer_id'])
+                    ->remarks('Sales Order')
+                    ->balance($totals[$key])
+                    ->stock_out($cartons[$key])
+                    ->quantity($data['stock_qty'])
+                    ->log();
+            // end log details 
 
         }
-        $this->session->set_flashdata("message", "Invoice #($invoice_id) Added Successfully!");
+        $this->session->set_flashdata("success", "Invoice #($invoice_id) Added Successfully!");
         redirect(base_url() . "index.php/Sales/sales_history");
 
 

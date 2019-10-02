@@ -236,6 +236,15 @@ class MY_Model extends CI_Model
         }
     }
 
+    public function log(){
+            // $this->logger
+            //     ->item(1)
+            //     ->user(2)
+            //     ->type('SR-ST')
+            //     ->remarks('sample delete action')
+            //     ->log(); 
+    }
+
 
 
 }

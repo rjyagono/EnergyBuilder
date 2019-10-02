@@ -9,15 +9,8 @@ class Reports extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-
-        if ($this->session->userdata('user_id')) {
-            
-        } else {
-
-
-            redirect(base_url() . 'index.php/Users/login');
-
-        }
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
     }
 
     //Purchase Report  Form
@@ -56,7 +49,7 @@ class Reports extends MY_Controller
         if (!empty($invoice)) {
             $this->bps_table();
             foreach ($invoice as $v_invoice) {
-                $data['invoice_details'][$v_invoice->purchase_no] = $this->Main_model->p_detail(array('purchase_no' => $v_invoice->purchase_no));
+                $data['invoice_details'][$v_invoice->purchase_id] = $this->Main_model->p_detail(array('purchase_id' => $v_invoice->purchase_id));
                 $data['order'][] = $v_invoice;
             }
         }
@@ -113,6 +106,22 @@ class Reports extends MY_Controller
         //print_r($data);
         $this->load->view('reports/sales_report',$data);
         $this->footer();
+    }
+
+    public function stock_summary(){
+        $data['items'] = $this->General->fetch_CoustomQuery("SELECT s.item_id, i.item_name, SUM(s.stock_qty) as qty, s.stock_rate ,SUM(s.stock_qty * s.stock_rate) as total FROM stock as s, item as i where s.item_id = i.item_id Group by s.item_id ");
+        
+        $this->header();
+        $this->load->view('reports/inventory_summary', $data);
+        $this->footer();   
+    }
+
+    public function stock_level(){
+        $data['items'] = $this->General->fetch_CoustomQuery("SELECT s.item_id, i.item_name, SUM(s.stock_qty) as qty, s.stock_rate , i.stock_limit FROM stock as s, item as i where s.item_id = i.item_id AND s.stock_qty < i.stock_limit Group by s.item_id ");
+        
+        $this->header();
+        $this->load->view('reports/stock_level', $data);
+        $this->footer();   
     }
 
 }

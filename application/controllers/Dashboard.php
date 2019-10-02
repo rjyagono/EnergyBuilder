@@ -12,21 +12,15 @@ class Dashboard extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        /*
-         * check sessions user data if it exists,
-         * it will go to the function requested
-         * otherwise it will redirect to login*/
-        if ($this->session->userdata("user_id")) {
-
-        } else {
-
-            redirect(base_url() . 'index.php/Users/login');
-        }
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
 
         //$cms_db = $this->load->database('forum', TRUE);
 
         //$imran_db = $this->load->database('imran', TRUE);
         //$this->employee->imran_db = $this->load->database('imran', TRUE);
+        $this->session->set_userdata("parent_name", '');
+        $this->session->set_userdata("parent_url", '');
     }
 
     public function testing()

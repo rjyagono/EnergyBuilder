@@ -14,7 +14,7 @@
                <div class="page-header">
                     <h3> List of Employees 
                         <div class="pull-right">
-                            <a href="<?= base_url(); ?>employees/add_employee"  class='btn btn-info'><i class="glyphicon glyphicon-plus"></i> Add New </a>
+                            <a href="<?= base_url(); ?>employees/add_employee"  class='btn btn-alert'><i class="glyphicon glyphicon-plus"></i> Add New </a>
                         </div>
                     </h3>
                 </div>
@@ -26,12 +26,11 @@
                     <table class="display table table-bordered table-striped dataTable" id="example1">
                         <thead>
                         <tr>
-                            <th>S.NO</th>
+                            <th>ID</th>
                             <th>EMP NAME</th>
                             <th>EMAIL</th>
-                            <th>PIC</th>
-                            <th>EDIT</th>
-                            <th>DETAILS</th>
+                            <th>CONTACT</th>
+                            <th></th> 
                         </tr>
                         </thead>
                         <tbody>
@@ -49,29 +48,20 @@
                             <td><?= $results->EMP_NAME ?></td>
 
                             <td><?= $results->EMP_EMAIL; ?></td>
-                            <td>
-                                <?php if ($results->EMP_PIC != ''){ ?>
-                                    <img src='<?= base_url() . '/' . $results->EMP_PIC ?>' width='60' height='70'>
-                                <?php } else{?>
-                                <img src='<?= base_url() . '/' . "uploads/images/no_avatar.jpg" ?>' width='60' height='70'></td>
-                            <?php } ?>
-
+                            <td><?= $results->EMP_CELL; ?></td>
                             <td>
                                 <?php if ($My_Controller->editPermission == NULL) {
                                     ?>
-                                    <a href='<?= base_url() ?>employees/edit_employee/<?= $results->EMP_ID ?>'
-                                       data-toggle='modal'
-                                       class='btn btn-app' <?php echo $My_Controller->editPermission; ?>><i
+                                    <a href='<?= base_url() ?>employees/edit_employee/<?= $results->EMP_ID ?>' 
+                                       class='btn btn-default' <?php echo $My_Controller->editPermission; ?>><i
                                             class='fa fa-pencil-square-o'></i>
-                                        Edit
                                     </a>
                                 <?php } else {
                                     echo "<span class='btn btn-danger'>No Access</span>";
                                 } ?>
-                            </td>
-                            <td>
+
                                 <a href='<?= base_url() ?>employees/employee_detail/<?= $results->EMP_ID ?>'
-                                   class='btn btn-app'><i class='fa fa-file-text'></i> Details</a>
+                                   class='btn btn-default'><i class='fa fa-file-text'></i></a>
                             </td>
                             <?php
 

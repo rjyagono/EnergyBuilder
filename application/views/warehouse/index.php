@@ -6,7 +6,7 @@
                 <div class="page-header">
                     <h3> List of Sites 
                         <div class="pull-right">
-                            <a href="#myModal-1" data-toggle='modal' class='btn btn-info'><i class="glyphicon glyphicon-plus"></i> Add New </a>
+                            <a href="#myModal-1" data-toggle='modal' class='btn btn-alert'><i class="glyphicon glyphicon-plus"></i> Add New </a>
                         </div>
                     </h3>
                 </div>
@@ -43,7 +43,7 @@
                             <td><?php echo $warehouse->phone_no ?></td>
                             <td>
                                 <a href='#myModal<?= $warehouse->warehouse_id; ?>' data-toggle='modal'
-                                   class='btn btn-warning' <?php echo $My_Controller->editPermission;?>
+                                   class='btn btn-default' <?php echo $My_Controller->editPermission;?>
                                 ><i class='fa fa-pencil-square-o'></i>
                                 </a>
                             </td>

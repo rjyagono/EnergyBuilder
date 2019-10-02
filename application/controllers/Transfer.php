@@ -9,19 +9,8 @@ class Transfer extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        
-        $this->load->model('Main_model');
-        $this->load->model('StockTransfer');
-
-        if ($this->session->userdata('user_id')) {
-            //
-        } else {
-
-
-            redirect(base_url() . 'index.php/Users/login');
-
-        }
-
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
     }
 
     // creating New Transfer Form
@@ -94,19 +83,39 @@ class Transfer extends MY_Controller
 
         $invoice_id = $this->input->post('invoice_id');
         $date = date('Y-m-d', strtotime($_POST['transfer_date']));
+        $warehouse_id = $this->_warehouse_id;
+        $user_id = $this->_user_id;
+
         $post_data = array(
             'transfer_date' => $date,
-            'source_warehouse_id' => $source_warehouse_id,
+            'source_warehouse_id' => $this->_warehouse_id,
             'destination_warehouse_id' => $destination_warehouse_id,
-            'transfer_status' => 1,
+            'transfer_status' => STATUS_INTRANSIT,
             'transfer_order_no' => $transfer_order_no,
-            'customer_id' => $customer_id
+            'transfer_total_amount' => $total_amount,
+            'reason' => $reason,
         );
 
 
         $this->db->insert("stock_transfers", $post_data);
         $invoice_id = $this->db->insert_id();
 
+                // echo $this->db->last_query();
+                // echo $this->db->insert_id();
+                // exit;
+
+        // log create
+            $this->logger
+                ->user($user_id)
+                ->user_name($this->_user_name)
+                ->transaction_id($invoice_id )
+                ->transaction_date(date('Y-m-d'))
+                ->warehouse($this->_warehouse_id)
+                ->type('ST')
+                ->remarks('Items In Transit for transfer')
+                ->balance($post_data['transfer_total_amount'])
+                ->log();
+        // end log
 
         // This code need to be reviewed why $invoice_id = $this->db->insert_id(); is not working
 
@@ -123,43 +132,148 @@ class Transfer extends MY_Controller
         $data = [];
         foreach ($product_ids as $key => $id) {
             if (strlen($cartons[$key]) > 0) {
-                $data1 = $this->Main_model->check_stock_record($id, $category_id[$key]);
+                $data1 = $this->Main_model->check_stock_record($id, $warehouse_id);
 
                 if ($data1 == 1) {
-                    $data = $this->Main_model->get_stock_qty($id, $category_id[$key]);
+                    $data = $this->Main_model->get_stock_qty($id, $warehouse_id);
                     $ids = $data->stock_qty;
                     $new_id = $ids - $cartons[$key];
 
                     $data = array(
                         "stock_qty" => $new_id,
                     );
-                    $where = array('item_id' => $id, 'category_id' => $category_id[$key]);
+                    $where = array('item_id' => $id, 'warehouse_id' => $warehouse_id);
                     $this->Main_model->update_record('stock', $data, $where);
 
-                } else {
-                    $data = array(
-                        "item_id" => $id,
-                        "category_id" => $category_id[$key],
-                        "stock_qty" => $cartons[$key],
-                    );
-                    $this->Main_model->add_record('stock', $data);
-                }
+                } 
+                // else {
+                //     $data = array(
+                //         "item_id" => $id,
+                //         "stock_qty" => $cartons[$key],
+                //         "warehouse_id" => $warehouse_id,
+                //     );
+                //     $this->Main_model->add_record('stock', $data);
+                // }
+
             }
 
             $row['stock_transfer_id'] = $invoice_id;
             $row['item_id'] = $id;
             $row['transfer_qty'] = $cartons[$key];
-            $row['status'] = 1;
-            $data = $row;
+            $row['transfer_rate'] = $rates[$key];
+            $row['transfer_totals'] = $totals[$key];
 
-            $res = $this->db->insert("stock_transfer_details", $data);
+            $res = $this->db->insert("stock_transfer_details", $row);
+
+            // log create
+                $this->logger
+                    ->user($user_id)
+                    ->user_name($this->_user_name)
+                    ->transaction_id($invoice_id)
+                    ->transaction_date(date('Y-m-d'))
+                    ->warehouse($this->_warehouse_id)
+                    ->stock_out($cartons[$key])
+                    ->type('ST') 
+                    ->remarks('Transfered to site '.$post_data['destination_warehouse_id'])
+                    ->quantity($data['stock_qty'])
+                    ->log();
+            // end log
+        }
+        
+        $this->session->set_flashdata("success", "Invoice #($transfer_order_no) Added Successfully!");
+        redirect(base_url() . "index.php/transfer/listings");
+
+
+    }
+
+    public function process_transfer(){
+        $id = $this->input->post('stock_transfer_id');
+        $warehouse_id = $this->_warehouse_id;
+        $user_id = $this->session->userdata('user_id');
+        $receive_date = $this->input->post('receive_date');
+        $receive_status = $this->input->post('transfer_status');
+
+        $where = array('stock_transfer_id' => $id);
+
+        $header = $this->Main_model->single_row('stock_transfers', $where);
+        $records = $this->StockTransfer->getSale_Details($id);
+
+        // save transfer header to receiving
+
+        $insert_arry = array(
+          'receive_date' => date('Y-m-d')    
+        );
+
+        // log create
+            $this->logger
+                ->user($user_id)
+                ->user_name($this->_user_name)
+                ->transaction_id($id)
+                ->transaction_date($receive_date)
+                ->warehouse($this->_warehouse_id)
+                ->type('ST')
+                ->remarks('Recieve Transfered Items')
+                ->balance($header->transfer_total_amount)
+                ->log();
+        // end log
+
+
+        // save transfer details to receiving details
+        $data = [];
+        foreach ($records as $record) {
+            if (strlen($record->transfer_qty) > 0) {
+                $data1 = $this->Main_model->check_stock_record($record->item_id, $header->destination_warehouse_id);
+
+                if ($data1 == 1) {
+                    $data = $this->Main_model->get_stock_qty($record->item_id, $header->destination_warehouse_id);
+                    $ids = $data->stock_qty;
+                    $new_qty = $ids + $record->transfer_qty;
+
+                    $data = array(
+                        "stock_qty" => $new_qty,
+                    );
+                    $where = array('item_id' => $record->item_id, 'warehouse_id' => $header->destination_warehouse_id);
+                    $this->Main_model->update_record('stock', $data, $where);
+
+                } else {
+                    $data = array(
+                        "item_id" => $record->item_id,
+                        "stock_qty" => $record->transfer_qty,
+                        "warehouse_id" => $header->destination_warehouse_id,
+                    );
+                    $this->Main_model->add_record('stock', $data);
+                }
+            }
+
+            // From Warehouse
+                $this->logger
+                    ->user($user_id)
+                    ->item($record->item_id)
+                    ->user_name($this->_user_name)
+                    ->transaction_id($id)
+                    ->transaction_date($receive_date)
+                    ->warehouse($header->destination_warehouse_id)
+                    ->stock_in($record->transfer_qty)
+                    ->type('ST')
+                    ->remarks('Recieve from site '.$this->_warehouse_id)
+                    ->balance($header->transfer_total_amount)
+                    ->quantity($data['stock_qty'])
+                    ->log();
+            // end log
+
 
         }
+ 
+        // if sucessfull transfer update stransfer header status
+            $data = ['transfer_status' => $receive_status, 'receive_date' => $receive_date];
+            $this->db->update('stock_transfers', $data, ['stock_transfer_id' => $id]); 
 
-        $this->session->set_flashdata("message", "Invoice #($transfer_order_no) Added Successfully!");
-        redirect(base_url() . "index.php/transfer/transfer_history");
+        // echo $this->db->last_query();
+        // echo $this->db->insert_id();
+        // exit;
 
-
+        $this->session->set_flashdata("success", "Items Transfered Successfully!");
+        redirect(base_url() . "index.php/transfer/listings");
     }
 
     // Sales Table
@@ -170,17 +284,18 @@ class Transfer extends MY_Controller
     }
 
     // Sales History or Sales List
-    public function transfer_history()
+    public function listings()
     {
-        $this->transfer_index();
-        $dat = array(
-            "warehouses " => " warehouses.warehouse_id = stock_transfers.source_warehouse_id"
-        );
+        // $this->transfer_index();
+        // $dat = array(
+        //     "warehouses " => " warehouses.warehouse_id = stock_transfers.source_warehouse_id"
+        // );
 
-        $data['transfer'] = $this->Main_model->get_join($dat);
+        // $data['transfers'] = $this->Main_model->get_join($dat);
+        $data['transfers'] = $this->StockTransfer->getListings();
 
         $this->header();
-        $this->load->view('transfer/transfer_history', $data);
+        $this->load->view('transfer/listings', $data);
         $this->footer();
     }
 
@@ -188,18 +303,28 @@ class Transfer extends MY_Controller
     public function transferItems()
     {
         $this->Main_model->bps_table('sales', 'sales_no');
-
     }
 
     // Show single sales history in invoice
-    public function show_transfer_history()
+    public function receive()
+    {
+        $this->header();
+        $id = $this->uri->segment(3);
+        $data['header'] = $this->StockTransfer->getTransaction_history($id);
+        $data['details'] = $this->StockTransfer->getSale_Details($id);
+        $this->load->view('transfer/receive', $data);
+        $this->footer();
+    }
+
+    // Show single sales history in invoice
+    public function show()
     {
         $id = $this->uri->segment(3);
         $data['header'] = $this->StockTransfer->getTransaction_history($id);
         $this->header();
         
         $data['details'] = $this->StockTransfer->getSale_Details($id);
-        $this->load->view('transfer/item_transfer_historynew', $data);
+        $this->load->view('transfer/show', $data);
         $this->footer();
     }
 
@@ -210,4 +335,5 @@ class Transfer extends MY_Controller
         
         $this->load->view('transfer/invoice_print', $data);
     }
+
 }

@@ -20,7 +20,6 @@ class Users extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('User');
     }
 
     /*
@@ -62,6 +61,8 @@ class Users extends MY_Controller
             $this->session->set_userdata("user_id", $login['USER_ID']);
             $this->session->set_userdata("group_id", $login['GROUP_ID']);
             $this->session->set_userdata("username", $login['USER_NAME']);
+            $this->session->set_userdata("warehouse_id", $login['WAREHOUSE_ID']);
+
             $user_id = $this->session->userdata("user_id");
 
             $response = $this->Main_model->getUserDetails($user_id);
@@ -93,16 +94,16 @@ class Users extends MY_Controller
     //Load View Form For User Creation.........
     public function add_user()
     {
-
         //Get employee list for drop down menu..................................
         $data['employeelist'] = $this->General->fetch_records("employee_profile");
         $data['grouplist'] = $this->General->fetch_records("usr_group");
+        $data['warehouses'] = $this->Main_model->select('warehouses');
         //Get user's list........................................................
-        $data['userlist'] = $this->General->fetch_CoustomQuery("SELECT * FROM employee_profile AS emp,
-		                                                            usr_group AS ug, usr_user AS uu
+        $data['userlist'] = $this->General->fetch_CoustomQuery("SELECT *, w.warehouse_name FROM employee_profile AS emp,
+		                                                            usr_group AS ug, usr_user AS uu 
+                                                                    JOIN warehouses AS w ON w.warehouse_id = uu.warehouse_id
 																	WHERE uu.GROUP_ID = ug.GROUP_ID
 																	AND uu.EMP_NO = emp.EMP_ID");
-
 
         $this->header($title = 'Add User');
         $this->load->view('users/add_user', $data);
@@ -123,6 +124,7 @@ class Users extends MY_Controller
         $userid = $this->session->userdata('user_id');
         $password = sha1(md5($this->input->post('password')));
         $username = $this->input->post('username');
+        $warehouse_id = $this->input->post('warehouse_id');
         $data_user = array(
 
             'USER_ID' => $user_no,
@@ -132,12 +134,17 @@ class Users extends MY_Controller
             "GROUP_ID" => $this->input->post('group_no'),
             "IS_ACTIVE" => 1,
             "CREATED_USERID" => $userid,
-            "CREATED_DATE" => $dt
+            "CREATED_DATE" => $dt,
+            'WAREHOUSE_ID' => $warehouse_id
 
         );
 
         $this->db->insert('usr_user', $data_user);
-        $this->session->set_flashdata('msg', 'Add Successfully');
+
+                //         echo $this->db->last_query();
+                // echo $this->db->insert_id();
+                // exit;
+        $this->session->set_flashdata('success', 'Add Successfully');
         redirect(base_url() . "index.php/Users/add_user");
 
     }
@@ -157,7 +164,7 @@ class Users extends MY_Controller
         $this->db->where('USER_ID', $id);
         $this->db->delete('usr_user');
 
-        $this->session->set_userdata('msg', 'User has been deleted successfully');
+        $this->session->set_flashdata('success', 'User has been deleted successfully');
         redirect(base_url() . 'index.php/Users/add_user');
 
     }
@@ -324,5 +331,13 @@ class Users extends MY_Controller
         } else {
             redirect(base_url() . "index.php/Users/user_list");
         }
+    }
+
+
+    public function activity(){
+        $this->header();
+        $data['logs'] = $this->Main_model->select('logger');
+        $this->load->view('users/activity', $data);
+        $this->footer();
     }
 }

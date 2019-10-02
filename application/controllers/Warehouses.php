@@ -9,16 +9,8 @@ class Warehouses extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        
-        $this->load->model('Main_model');
-        $this->load->model('Warehouse');
-
-        if ($this->session->userdata('user_id')) {
-        } else {
-            
-            redirect(base_url() . 'index.php/Users/login');
-
-        }
+        //Check if user is logged in or id exists in session
+        $this->checkUserSession();
     }
 
     // Get Vendor Table
@@ -71,7 +63,7 @@ class Warehouses extends MY_Controller
         $where = array('warehouse_id' => $id);
         $response = $this->Main_model->update_record('warehouses', $data, $where);
         if ($response) {
-            $this->session->set_flashdata('update', 'Record Updated Successfully..!');
+            $this->session->set_flashdata('success', 'Record Updated Successfully..!');
             redirect(base_url() . 'index.php/warehouses/listings');
         }
     }

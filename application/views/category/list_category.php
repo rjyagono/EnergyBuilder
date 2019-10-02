@@ -1,15 +1,17 @@
 <!-- page start-->
+<?php if ($this->session->flashdata('msg'))
+    echo $this->session->flashdata('msg');
+?>
 <div class="row">
     <div class="col-md-12 col-lg-12 col-sm-12">
         <div class="box light bordered">
-            <div class="box-header with-border">
-                <h4>CATEGORIES | <a href='#myModal-1' data-toggle='modal' class='btn btn-info'>
-                        Add New <i class="fa fa-plus"></i>
-                    </a></h4>
+            <div class="page-header">
+                <h3> List of Categories 
+                    <div class="pull-right">
+                        <a href="#myModal-1" data-toggle='modal' class='btn btn-alert'><i class="glyphicon glyphicon-plus"></i> Add New </a>
+                    </div>
+                </h3>
             </div>
-            <?php if ($this->session->flashdata('msg'))
-                echo $this->session->flashdata('msg');
-            ?>
             <div class="box-body">
 
                 <div class="adv-table editable-table table-responsive">
@@ -42,8 +44,7 @@
                                 <td><?=$results->category_name;?>
                                 <td>
                                     <a href='#myModal<?=$results->category_id;?>' data-toggle='modal'
-                                       class='btn btn-warning' <?php echo $My_Controller->editPermission;?>><i class='fa fa-pencil-square-o'></i>
-                                        Edit
+                                       class='btn btn-default' <?php echo $My_Controller->editPermission;?>><i class='fa fa-pencil-square-o'></i>
                                     </a>
                                 </td>
 
@@ -87,7 +88,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn green">Save changes</button>
+                    <button type="submit" class="btn btn-success">Save changes</button>
                 </div>
                 </form>
             </div>
